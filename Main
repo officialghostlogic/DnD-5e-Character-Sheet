@@ -1,0 +1,2503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D&D 5e Character Dashboard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+        
+        :root {
+            --primary-bg: linear-gradient(135deg, #f4f1e8 0%, #e8dcc0 100%);
+            --secondary-bg: linear-gradient(135deg, #fefcf7 0%, #f7f0e8 100%);
+            --border-color: #8b7355;
+            --text-color: #2c2416;
+            --accent-color: #6b4423;
+            --glass-bg: rgba(255,255,255,0.9);
+            --glass-border: rgba(255,255,255,0.95);
+            --shadow: rgba(0,0,0,0.1);
+            --fantasy-font: 'Cinzel', serif;
+            --body-font: 'Crimson Text', serif;
+            --border-radius: 12px;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        
+        .dark-theme {
+            --primary-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --secondary-bg: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            --border-color: #475569;
+            --text-color: #f1f5f9;
+            --accent-color: #60a5fa;
+            --glass-bg: rgba(30,41,59,0.9);
+            --glass-border: rgba(71,85,105,0.6);
+        }
+        
+        * { box-sizing: border-box; }
+        
+        body {
+            font-family: var(--body-font);
+            background: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+        
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        .dashboard-header {
+            background: var(--glass-bg);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .character-title {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .character-image-placeholder {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px dashed var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--glass-bg);
+            color: var(--accent-color);
+            font-size: 2rem;
+        }
+        
+        .character-image-placeholder:hover {
+            border-color: var(--accent-color);
+            background: var(--accent-color);
+            color: white;
+        }
+        
+        .character-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid var(--border-color);
+            object-fit: cover;
+            margin-right: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .character-image:hover {
+            border-color: var(--accent-color);
+            transform: scale(1.05);
+        }
+        
+        .character-info {
+            flex: 1;
+        }
+        
+        .character-name {
+            font-family: var(--fantasy-font);
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            margin: 0 0 8px 0;
+        }
+        
+        .character-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin: 0;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 18px;
+            border: 1px solid var(--border-color);
+            background: linear-gradient(135deg, var(--accent-color), var(--border-color));
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: var(--body-font);
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+        
+        .btn.secondary {
+            background: var(--glass-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        /* Dashboard grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        /* Dashboard cards */
+        .dashboard-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px var(--shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+        
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-color);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .dashboard-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .card-icon {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+        }
+        
+        .card-title {
+            font-family: var(--fantasy-font);
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            margin: 0;
+        }
+        
+        .card-content {
+            color: var(--text-color);
+        }
+        
+        /* Vital stats */
+        .vital-stats {
+            display: flex;
+            gap: 20px;
+            justify-content: space-between;
+        }
+        
+        .vital-stat {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .vital-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 4px;
+        }
+        
+        .vital-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .hp-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .hp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--warning));
+            transition: width 0.3s ease;
+        }
+        
+        /* Ability scores */
+        .abilities-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        
+        .ability-score {
+            text-align: center;
+            padding: 8px;
+            background: var(--secondary-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .ability-name {
+            font-size: 0.7rem;
+            font-weight: 600;
+            opacity: 0.7;
+            margin-bottom: 4px;
+        }
+        
+        .ability-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        /* Quick lists */
+        .quick-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .quick-list li {
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border-color);
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+        
+        .quick-list li:last-child {
+            border-bottom: none;
+        }
+        
+        /* Status indicators */
+        .status-good { color: var(--success); }
+        .status-warning { color: var(--warning); }
+        .status-danger { color: var(--danger); }
+        
+        /* Death Saves */
+        .death-saves {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .save-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .save-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            opacity: 0.7;
+            text-transform: uppercase;
+        }
+        
+        .save-dots {
+            display: flex;
+            gap: 3px;
+        }
+        
+        .save-dot {
+            width: 12px;
+            height: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .save-dot.success.filled {
+            background: var(--success) !important;
+            border-color: var(--success) !important;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+        }
+        
+        .save-dot.failure.filled {
+            background: var(--danger) !important;
+            border-color: var(--danger) !important;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+        }
+        
+        .save-dot:hover {
+            transform: scale(1.2);
+        }
+        
+        .death-save-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            justify-content: center;
+        }
+        
+        .mini-btn {
+            padding: 4px 8px;
+            border: 1px solid var(--border-color);
+            background: var(--accent-color);
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 10px;
+            transition: all 0.2s ease;
+        }
+        
+        .mini-btn:hover {
+            background: var(--border-color);
+        }
+        
+        /* Hit Dice */
+        .hit-dice-container {
+            margin: 10px 0;
+        }
+        
+        .hit-dice-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .hit-dice-value {
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        .hit-dice-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        /* Edit modal */
+        .edit-mode {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .edit-mode.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .edit-panel {
+            background: var(--secondary-bg);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px var(--shadow);
+        }
+        
+        .edit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .edit-title {
+            font-family: var(--fantasy-font);
+            font-size: 1.6rem;
+            color: var(--accent-color);
+            margin: 0;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+            padding: 5px;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+        
+        .close-btn:hover {
+            background: var(--glass-bg);
+        }
+        
+        /* Form styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--accent-color);
+            font-size: 0.9rem;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--glass-bg);
+            color: var(--text-color);
+            font-family: var(--body-font);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(107, 68, 35, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .skill-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .skill-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: var(--glass-bg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .skill-checkbox {
+            margin: 0;
+            width: auto;
+        }
+        
+        .spell-slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .slot-group {
+            text-align: center;
+            padding: 15px;
+            background: var(--glass-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .equipment-list {
+            margin-top: 15px;
+        }
+        
+        .equipment-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .equipment-item input {
+            margin: 0;
+        }
+        
+        .remove-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .add-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        /* Dice rolling integration */
+        .dice-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 8px;
+            transition: all 0.2s ease;
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        
+        .quick-list li:hover .dice-btn,
+        .ability-score:hover .dice-btn,
+        .vital-stat:hover .dice-btn {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .dice-btn:hover {
+            background: var(--border-color);
+            transform: scale(1.1);
+        }
+        
+        /* Roll result popup */
+        .roll-result {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-color);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 2000;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            animation: rollPopup 2s ease-out forwards;
+        }
+        
+        @keyframes rollPopup {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5) rotate(-10deg);
+            }
+            20% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.1) rotate(2deg);
+            }
+            40% {
+                transform: translate(-50%, -50%) scale(1) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.9) translateY(-20px);
+            }
+        }
+        
+        /* Dice log widget */
+        .dice-log-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 20px var(--shadow);
+            transition: all 0.3s ease;
+            z-index: 100;
+            color: white;
+            font-size: 24px;
+        }
+        
+        .dice-log-widget:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px var(--shadow);
+        }
+        
+        .dice-log-panel {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 300px;
+            max-height: 400px;
+            background: var(--secondary-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 10px 30px var(--shadow);
+            overflow-y: auto;
+            transform: translateY(20px) scale(0.9);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 99;
+        }
+        
+        .dice-log-panel.active {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+        
+        .dice-log-header {
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .dice-log-entry {
+            background: var(--glass-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 6px;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .roll-total {
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        .roll-details {
+            opacity: 0.7;
+            font-size: 11px;
+        }
+
+        /* Conditions & Status Styles */
+        .status-section {
+            margin-bottom: 15px;
+        }
+
+        .inspiration-tracker, .concentration-tracker {
+            margin-bottom: 10px;
+        }
+
+        .inspiration-display, .concentration-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .inspiration-dot {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            background: var(--glass-bg);
+        }
+
+        .inspiration-dot.active {
+            background: var(--warning) !important;
+            border-color: var(--warning) !important;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+            transform: scale(1.1);
+        }
+
+        .inspiration-dot:hover {
+            transform: scale(1.2);
+            border-color: var(--accent-color);
+        }
+
+        .conditions-list {
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .condition-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 8px;
+            margin: 2px 0;
+            background: var(--secondary-bg);
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            font-size: 0.85rem;
+        }
+
+        .condition-item.active {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        .condition-remove {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            padding: 2px;
+            border-radius: 2px;
+            font-size: 12px;
+        }
+
+        .condition-remove:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .concentration-active {
+            color: var(--warning) !important;
+            font-weight: bold;
+        }
+
+        /* Notes Styles */
+        .notes-preview {
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .note-item {
+            padding: 4px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .note-item:last-child {
+            border-bottom: none;
+        }
+
+        .note-item.empty {
+            opacity: 0.5;
+            font-style: italic;
+        }
+
+        /* Enhanced form styles for new sections */
+        .conditions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .condition-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: var(--glass-bg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .condition-toggle:hover {
+            background: var(--secondary-bg);
+        }
+
+        .condition-toggle.active {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        .condition-checkbox {
+            margin: 0;
+            width: auto;
+        }
+
+        .notes-textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="header-content">
+                <div class="character-title">
+                    <div class="character-image-placeholder" onclick="Dashboard.uploadImage()" id="character-image-container">
+                        📷
+                    </div>
+                    <div class="character-info">
+                        <h1 class="character-name" id="character-name">Thorin Ironforge</h1>
+                        <p class="character-subtitle" id="character-subtitle">Level 3 Fighter • Lawful Good</p>
+                    </div>
+                </div>
+                <div class="quick-actions">
+                    <button class="btn secondary" onclick="Dashboard.toggleTheme()">🌙 Dark Mode</button>
+                    <button class="btn secondary" onclick="Dashboard.loadTemplate()">📋 Templates</button>
+                    <button class="btn" onclick="Dashboard.save()">💾 Save</button>
+                    <button class="btn secondary" onclick="Dashboard.exportData()">📤 Export</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Vital Stats Card -->
+            <div class="dashboard-card" onclick="Dashboard.editSection('vitals')">
+                <div class="card-header">
+                    <div class="card-icon">⚡</div>
+                    <h3 class="card-title">Vital Stats</h3>
+                </div>
+                <div class="card-content">
+                    <div class="vital-stats">
+                        <div class="vital-stat">
+                            <div class="vital-value status-good" id="hp-display">28/28</div>
+                            <div class="vital-label">Hit Points</div>
+                            <div class="hp-bar">
+                                <div class="hp-fill" id="hp-bar" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        <div class="vital-stat">
+                            <div class="vital-value" id="ac-display">18</div>
+                            <div class="vital-label">Armor Class</div>
+                        </div>
+                        <div class="vital-stat">
+                            <div class="vital-value" id="speed-display">25</div>
+                            <div class="vital-label">Speed (ft)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ability Scores Card -->
+            <div class="dashboard-card" onclick="Dashboard.editSection('abilities')">
+                <div class="card-header">
+                    <div class="card-icon">💪</div>
+                    <h3 class="card-title">Ability Scores</h3>
+                </div>
+                <div class="card-content">
+                    <div class="abilities-grid">
+                        <div class="ability-score">
+                            <div class="ability-name">STR</div>
+                            <div class="ability-value" id="str-display">16 (+3)</div>
+                            <button class="dice-btn" onclick="event.stopPropagation(); Dashboard.rollAbility('str')" title="Roll STR check">🎲</button>
+                        </div>
+                        <div class="ability-score">
+                            <div class="ability-name">DEX</div>
+                            <div class="ability-value" id="dex-display">13 (+1)</div>
+                            <button class="dice-btn" onclick="event.stopPropagation(); Dashboard.rollAbility('dex')" title="Roll DEX check">🎲</button>
+                        </div>
+                        <div class="ability-score">
+                            <div class="ability-name">CON</div>
+                            <div class="ability-value" id="con-display">15 (+2)</div>
+                            <button class="dice-btn" onclick="event.stopPropagation(); Dashboard.rollAbility('con')" title="Roll CON check">🎲</button>
+                        </div>
+                        <div class="ability-score">
+                            <div class="ability-name">INT</div>
+                            <div class="ability-value" id="int-display">10 (+0)</div>
+                            <button class="dice-btn" onclick="event.stopPropagation(); Dashboard.rollAbility('int')" title="Roll INT check">🎲</button>
+                        </div>
+                        <div class="ability-score">
+                            <div class="ability-name">WIS</div>
+                            <div class="ability-value" id="wis-display">12 (+1)</div>
+                            <button class="dice-btn" onclick="event.stopPropagation(); Dashboard.rollAbility('wis')" title="Roll WIS check">🎲</button>
+                        </div>
+                        <div class="ability-score">
+                            <div class="ability-name">CHA</div>
+                            <div class="ability-value" id="cha-display">8 (-1)</div>
+                            <button class="dice-btn" onclick="event.stopPropagation(); Dashboard.rollAbility('cha')" title="Roll CHA check">🎲</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Combat Card -->
+            <div class="dashboard-card" onclick="Dashboard.editSection('combat')">
+                <div class="card-header">
+                    <div class="card-icon">⚔️</div>
+                    <h3 class="card-title">Combat</h3>
+                </div>
+                <div class="card-content">
+                    <ul class="quick-list">
+                        <li>
+                            <strong>Initiative:</strong> <span id="init-display">+1</span>
+                            <button class="dice-btn" onclick="event.stopPropagation(); Dashboard.rollInitiative()" title="Roll Initiative">🎲</button>
+                        </li>
+                        <li><strong>Proficiency:</strong> <span id="prof-display">+2</span></li>
+                    </ul>
+                    
+                    <!-- Hit Dice Section -->
+                    <div class="hit-dice-container">
+                        <div class="hit-dice-display">
+                            <strong>Hit Dice:</strong> 
+                            <span class="hit-dice-value" id="hd-display">3/3 d10</span>
+                        </div>
+                        <div class="hit-dice-actions">
+                            <button class="mini-btn" onclick="event.stopPropagation(); Dashboard.rollHitDie()" title="Roll Hit Die for healing">🎲 Roll</button>
+                            <button class="mini-btn" onclick="event.stopPropagation(); Dashboard.spendHitDie()" title="Spend a Hit Die">-1</button>
+                            <button class="mini-btn" onclick="event.stopPropagation(); Dashboard.restoreHitDice()" title="Long rest - restore all">Rest</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Death Saves Section -->
+                    <div class="death-saves">
+                        <div class="save-group">
+                            <div class="save-label">Successes</div>
+                            <div class="save-dots">
+                                <div class="save-dot success" onclick="event.stopPropagation(); Dashboard.toggleDeathSave('success', 0)" id="success-0"></div>
+                                <div class="save-dot success" onclick="event.stopPropagation(); Dashboard.toggleDeathSave('success', 1)" id="success-1"></div>
+                                <div class="save-dot success" onclick="event.stopPropagation(); Dashboard.toggleDeathSave('success', 2)" id="success-2"></div>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                            <button class="mini-btn" onclick="event.stopPropagation(); Dashboard.rollDeathSave()" title="Roll Death Saving Throw">🎲 Death Save</button>
+                            <button class="mini-btn" onclick="event.stopPropagation(); Dashboard.resetDeathSaves()" title="Reset Death Saves">Reset</button>
+                        </div>
+                        <div class="save-group">
+                            <div class="save-label">Failures</div>
+                            <div class="save-dots">
+                                <div class="save-dot failure" onclick="event.stopPropagation(); Dashboard.toggleDeathSave('failure', 0)" id="failure-0"></div>
+                                <div class="save-dot failure" onclick="event.stopPropagation(); Dashboard.toggleDeathSave('failure', 1)" id="failure-1"></div>
+                                <div class="save-dot failure" onclick="event.stopPropagation(); Dashboard.toggleDeathSave('failure', 2)" id="failure-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skills Card -->
+            <div class="dashboard-card" onclick="Dashboard.editSection('skills')">
+                <div class="card-header">
+                    <div class="card-icon">🎯</div>
+                    <h3 class="card-title">Skills & Saves</h3>
+                </div>
+                <div class="card-content">
+                    <ul class="quick-list">
+                        <li>
+                            <strong>Athletics:</strong> +5 (Prof)
+                            <button class="dice-btn" onclick="event.stopPropagation(); Dashboard.rollSkill('Athletics', 5)" title="Roll Athletics">🎲</button>
+                        </li>
+                        <li>
+                            <strong>Intimidation:</strong> +1 (Prof)
+                            <button class="dice-btn" onclick="event.stopPropagation(); Dashboard.rollSkill('Intimidation', 1)" title="Roll Intimidation">🎲</button>
+                        </li>
+                        <li>
+                            <strong>Perception:</strong> +1
+                            <button class="dice-btn" onclick="event.stopPropagation(); Dashboard.rollSkill('Perception', 1)" title="Roll Perception">🎲</button>
+                        </li>
+                        <li>
+                            <strong>Insight:</strong> +1
+                            <button class="dice-btn" onclick="event.stopPropagation(); Dashboard.rollSkill('Insight', 1)" title="Roll Insight">🎲</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Spells Card -->
+            <div class="dashboard-card" onclick="Dashboard.editSection('spells')">
+                <div class="card-header">
+                    <div class="card-icon">✨</div>
+                    <h3 class="card-title">Spells & Magic</h3>
+                </div>
+                <div class="card-content">
+                    <ul class="quick-list">
+                        <li><strong>Spellcasting:</strong> None</li>
+                        <li><strong>Cantrips:</strong> 0</li>
+                        <li><strong>1st Level:</strong> 0/0</li>
+                        <li><strong>Spell Attack:</strong> —</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Equipment Card -->
+            <div class="dashboard-card" onclick="Dashboard.editSection('equipment')">
+                <div class="card-header">
+                    <div class="card-icon">🎒</div>
+                    <h3 class="card-title">Equipment</h3>
+                </div>
+                <div class="card-content">
+                    <ul class="quick-list">
+                        <li><strong>Longsword</strong> +5 (1d8+3)</li>
+                        <li><strong>Chain Mail</strong> AC 16</li>
+                        <li><strong>Shield</strong> +2 AC</li>
+                        <li><strong>Gold:</strong> 150 gp</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Conditions & Status Card -->
+            <div class="dashboard-card" onclick="Dashboard.editSection('conditions')">
+                <div class="card-header">
+                    <div class="card-icon">🔥</div>
+                    <h3 class="card-title">Conditions & Status</h3>
+                </div>
+                <div class="card-content">
+                    <div class="status-section">
+                        <div class="inspiration-tracker">
+                            <div class="inspiration-display">
+                                <strong>Inspiration:</strong>
+                                <div class="inspiration-dot" id="inspiration-dot" onclick="event.stopPropagation(); Dashboard.toggleInspiration()" title="Click to toggle inspiration">
+                                    ✨
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="concentration-tracker">
+                            <div class="concentration-display">
+                                <strong>Concentration:</strong>
+                                <span id="concentration-spell">None</span>
+                                <button class="mini-btn" onclick="event.stopPropagation(); Dashboard.rollConcentration()" title="Roll Concentration Save" id="concentration-btn" style="display: none;">🎲 Save</button>
+                                <button class="mini-btn" onclick="event.stopPropagation(); Dashboard.endConcentration()" title="End Concentration" id="end-concentration-btn" style="display: none;">End</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="conditions-list" id="conditions-display">
+                        <div class="condition-item">No active conditions</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes Card -->
+            <div class="dashboard-card" onclick="Dashboard.editSection('notes')">
+                <div class="card-header">
+                    <div class="card-icon">📝</div>
+                    <h3 class="card-title">Notes & Reminders</h3>
+                </div>
+                <div class="card-content">
+                    <div class="notes-preview" id="notes-preview">
+                        <div class="note-item">Click to add session notes...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dice Log Widget -->
+    <div class="dice-log-widget" onclick="Dashboard.toggleDiceLog()" title="Dice Roll History">
+        🎲
+    </div>
+    
+    <div class="dice-log-panel" id="dice-log-panel">
+        <div class="dice-log-header">
+            <span>🎲 Roll History</span>
+            <button onclick="Dashboard.clearDiceLog()" style="background: none; border: none; color: var(--accent-color); cursor: pointer;">Clear</button>
+        </div>
+        <div id="dice-log-entries">
+            <!-- Roll entries will be added here -->
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="edit-mode" id="edit-modal">
+        <div class="edit-panel">
+            <div class="edit-header">
+                <h2 class="edit-title" id="edit-title">Edit Section</h2>
+                <button class="close-btn" onclick="Dashboard.closeEdit()">×</button>
+            </div>
+            <div id="edit-content">
+                <!-- Dynamic content loaded here -->
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 25px;">
+                <button class="btn secondary" onclick="Dashboard.closeEdit()">Cancel</button>
+                <button class="btn" onclick="Dashboard.saveEdit()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dashboard object - clean and functional
+        window.Dashboard = {
+            data: {
+                character: {
+                    name: 'Thorin Ironforge',
+                    class: 'Fighter',
+                    level: 3,
+                    alignment: 'Lawful Good',
+                    image: null,
+                    hp: { current: 28, max: 28, temp: 0 },
+                    ac: 18,
+                    speed: 25,
+                    abilities: {
+                        str: 16, dex: 13, con: 15,
+                        int: 10, wis: 12, cha: 8
+                    },
+                    hitDice: {
+                        current: 3,
+                        max: 3,
+                        type: 'd10'
+                    },
+                    deathSaves: {
+                        successes: 0,
+                        failures: 0
+                    },
+                    inspiration: false,
+                    concentration: {
+                        active: false,
+                        spell: '',
+                        dc: 10
+                    },
+                    conditions: [],
+                    notes: {
+                        session: '',
+                        character: 'A devout cleric seeking to spread light and healing.',
+                        plot: ''
+                    },
+                    inspiration: false,
+                    concentration: {
+                        active: false,
+                        spell: '',
+                        dc: 10
+                    },
+                    conditions: [],
+                    notes: {
+                        session: '',
+                        character: '',
+                        plot: ''
+                    },
+                    skills: {
+                        athletics: true,
+                        intimidation: true,
+                        perception: false,
+                        insight: false
+                    },
+                    saves: {
+                        str: true,
+                        con: true
+                    },
+                    spells: {
+                        ability: 'none',
+                        slots: { 1: 0, 2: 0, 3: 0 },
+                        known: []
+                    },
+                    equipment: [
+                        { name: 'Longsword', quantity: 1, weight: '3 lb', notes: '+5 to hit, 1d8+3 damage' },
+                        { name: 'Chain Mail', quantity: 1, weight: '55 lb', notes: 'AC 16' },
+                        { name: 'Shield', quantity: 1, weight: '6 lb', notes: '+2 AC' }
+                    ],
+                    currency: { cp: 0, sp: 0, gp: 150, pp: 0 }
+                }
+            },
+            
+            calculateModifier(score) {
+                return Math.floor((score - 10) / 2);
+            },
+
+            // Dice rolling functions
+            rollD20() {
+                return Math.floor(Math.random() * 20) + 1;
+            },
+
+            rollDie(sides) {
+                return Math.floor(Math.random() * sides) + 1;
+            },
+
+            rollAbility(ability) {
+                const abilityNames = {
+                    str: 'Strength',
+                    dex: 'Dexterity', 
+                    con: 'Constitution',
+                    int: 'Intelligence',
+                    wis: 'Wisdom',
+                    cha: 'Charisma'
+                };
+                
+                const score = this.data.character.abilities[ability];
+                const modifier = this.calculateModifier(score);
+                const roll = this.rollD20();
+                const total = roll + modifier;
+                
+                this.showRollResult(`${abilityNames[ability]} Check`, roll, modifier, total);
+                this.addToRollHistory(`${abilityNames[ability]} Check`, roll, modifier, total);
+            },
+
+            rollInitiative() {
+                const dexMod = this.calculateModifier(this.data.character.abilities.dex);
+                const roll = this.rollD20();
+                const total = roll + dexMod;
+                
+                this.showRollResult('Initiative', roll, dexMod, total);
+                this.addToRollHistory('Initiative', roll, dexMod, total);
+            },
+
+            rollSkill(skillName, bonus) {
+                const roll = this.rollD20();
+                const total = roll + bonus;
+                
+                this.showRollResult(`${skillName} Check`, roll, bonus, total);
+                this.addToRollHistory(`${skillName} Check`, roll, bonus, total);
+            },
+
+            // Hit Dice functionality
+            rollHitDie() {
+                const char = this.data.character;
+                if (char.hitDice.current <= 0) {
+                    alert('No hit dice remaining!');
+                    return;
+                }
+
+                const dieType = parseInt(char.hitDice.type.substring(1)); // Remove 'd' from 'd10'
+                const roll = this.rollDie(dieType);
+                const conMod = this.calculateModifier(char.abilities.con);
+                const healing = Math.max(1, roll + conMod); // Minimum 1 HP
+
+                // Heal the character
+                char.hp.current = Math.min(char.hp.max, char.hp.current + healing);
+                
+                // Spend a hit die
+                char.hitDice.current--;
+
+                this.showRollResult('Hit Die Healing', roll, conMod, healing, 'You recover ' + healing + ' hit points!');
+                this.addToRollHistory('Hit Die', roll, conMod, healing);
+                this.updateDisplay();
+            },
+
+            spendHitDie() {
+                const char = this.data.character;
+                if (char.hitDice.current > 0) {
+                    char.hitDice.current--;
+                    this.updateDisplay();
+                } else {
+                    alert('No hit dice remaining!');
+                }
+            },
+
+            restoreHitDice() {
+                const char = this.data.character;
+                const restored = Math.max(1, Math.floor(char.hitDice.max / 2));
+                char.hitDice.current = Math.min(char.hitDice.max, char.hitDice.current + restored);
+                this.updateDisplay();
+                
+                // Show notification
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'roll-result';
+                resultDiv.style.background = 'var(--success)';
+                resultDiv.innerHTML = `
+                    <div>
+                        <div style="font-size: 0.9em; margin-bottom: 5px;">Long Rest</div>
+                        <div style="font-size: 1.2em;">Hit Dice Restored!</div>
+                        <div style="font-size: 0.8em; margin-top: 5px;">+${restored} hit dice</div>
+                    </div>
+                `;
+                
+                document.body.appendChild(resultDiv);
+                setTimeout(() => {
+                    if (document.body.contains(resultDiv)) {
+                        document.body.removeChild(resultDiv);
+                    }
+                }, 2000);
+            },
+
+            // Death Save functionality
+            rollDeathSave() {
+                const roll = this.rollD20();
+                let result = '';
+                let resultClass = '';
+
+                if (roll === 20) {
+                    // Natural 20 - regain 1 HP
+                    this.data.character.hp.current = 1;
+                    this.resetDeathSaves();
+                    result = 'Natural 20! You regain 1 HP and stabilize!';
+                    resultClass = 'status-good';
+                } else if (roll === 1) {
+                    // Natural 1 - two failures
+                    this.data.character.deathSaves.failures = Math.min(3, this.data.character.deathSaves.failures + 2);
+                    result = 'Natural 1! Two death save failures!';
+                    resultClass = 'status-danger';
+                } else if (roll >= 10) {
+                    // Success
+                    this.data.character.deathSaves.successes++;
+                    result = 'Success!';
+                    resultClass = 'status-good';
+                } else {
+                    // Failure
+                    this.data.character.deathSaves.failures++;
+                    result = 'Failure!';
+                    resultClass = 'status-danger';
+                }
+
+                // Check for death or stabilization
+                if (this.data.character.deathSaves.failures >= 3) {
+                    result += ' You have died!';
+                    resultClass = 'status-danger';
+                } else if (this.data.character.deathSaves.successes >= 3) {
+                    result += ' You are stable!';
+                    resultClass = 'status-good';
+                }
+
+                this.showRollResult('Death Saving Throw', roll, 0, roll, result, resultClass);
+                this.addToRollHistory('Death Save', roll, 0, roll);
+                this.updateDisplay();
+            },
+
+            toggleDeathSave(type, index) {
+                const saves = this.data.character.deathSaves;
+                const dots = document.querySelectorAll(`.save-dot.${type}`);
+                
+                if (index < saves[type]) {
+                    // Clicking on a filled dot - remove this and all after it
+                    saves[type] = index;
+                } else {
+                    // Clicking on an empty dot - fill up to and including this one
+                    saves[type] = index + 1;
+                }
+                
+                this.updateDeathSaves();
+            },
+
+            resetDeathSaves() {
+                this.data.character.deathSaves.successes = 0;
+                this.data.character.deathSaves.failures = 0;
+                this.updateDeathSaves();
+            },
+
+            updateDeathSaves() {
+                const saves = this.data.character.deathSaves;
+                
+                // Update success dots
+                for (let i = 0; i < 3; i++) {
+                    const dot = document.getElementById(`success-${i}`);
+                    if (dot) {
+                        if (i < saves.successes) {
+                            dot.classList.add('filled');
+                        } else {
+                            dot.classList.remove('filled');
+                        }
+                    }
+                }
+                
+                // Update failure dots
+                for (let i = 0; i < 3; i++) {
+                    const dot = document.getElementById(`failure-${i}`);
+                    if (dot) {
+                        if (i < saves.failures) {
+                            dot.classList.add('filled');
+                        } else {
+                            dot.classList.remove('filled');
+                        }
+                    }
+                }
+            },
+
+            // Inspiration functionality
+            toggleInspiration() {
+                this.data.character.inspiration = !this.data.character.inspiration;
+                this.updateDisplay();
+                
+                const inspirationDot = document.getElementById('inspiration-dot');
+                if (this.data.character.inspiration) {
+                    inspirationDot.classList.add('active');
+                    this.showNotification('Inspiration Gained!', 'You now have inspiration to use on a roll.', 'var(--warning)');
+                } else {
+                    inspirationDot.classList.remove('active');
+                    this.showNotification('Inspiration Used', 'You have used your inspiration.', 'var(--accent-color)');
+                }
+            },
+
+            // Concentration functionality
+            startConcentration(spellName, dc = 10) {
+                this.data.character.concentration.active = true;
+                this.data.character.concentration.spell = spellName;
+                this.data.character.concentration.dc = dc;
+                this.updateDisplay();
+            },
+
+            rollConcentration(damage = 0) {
+                const dc = Math.max(10, Math.floor(damage / 2));
+                const conMod = this.calculateModifier(this.data.character.abilities.con);
+                const profBonus = this.data.character.saves.con ? Math.ceil(this.data.character.level / 4) + 1 : 0;
+                const roll = this.rollD20();
+                const total = roll + conMod + profBonus;
+                
+                const success = total >= dc;
+                const result = success ? 'Concentration maintained!' : 'Concentration broken!';
+                const resultClass = success ? 'status-good' : 'status-danger';
+                
+                this.showRollResult(`Concentration Save (DC ${dc})`, roll, conMod + profBonus, total, result, resultClass);
+                this.addToRollHistory('Concentration', roll, conMod + profBonus, total);
+                
+                if (!success) {
+                    this.endConcentration();
+                }
+            },
+
+            endConcentration() {
+                this.data.character.concentration.active = false;
+                this.data.character.concentration.spell = '';
+                this.updateDisplay();
+                this.showNotification('Concentration Ended', 'You are no longer concentrating on a spell.', 'var(--accent-color)');
+            },
+
+            // Conditions functionality
+            toggleCondition(condition) {
+                const conditions = this.data.character.conditions;
+                const index = conditions.indexOf(condition);
+                
+                if (index > -1) {
+                    conditions.splice(index, 1);
+                } else {
+                    conditions.push(condition);
+                }
+                
+                this.updateDisplay();
+            },
+
+            // Notes functionality
+            updateNotes(type, content) {
+                this.data.character.notes[type] = content;
+            },
+
+            // Utility notification function
+            showNotification(title, message, color = 'var(--accent-color)') {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'roll-result';
+                resultDiv.style.background = color;
+                resultDiv.innerHTML = `
+                    <div>
+                        <div style="font-size: 0.9em; margin-bottom: 5px;">${title}</div>
+                        <div style="font-size: 1em;">${message}</div>
+                    </div>
+                `;
+                
+                document.body.appendChild(resultDiv);
+                setTimeout(() => {
+                    if (document.body.contains(resultDiv)) {
+                        document.body.removeChild(resultDiv);
+                    }
+                }, 2000);
+            },
+
+            showRollResult(rollType, d20Roll, modifier, total, extraText = '', extraClass = '') {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'roll-result';
+                
+                const critClass = d20Roll === 20 ? 'status-good' : d20Roll === 1 ? 'status-danger' : extraClass;
+                
+                let modifierText = '';
+                if (modifier !== 0) {
+                    modifierText = ` ${modifier >= 0 ? '+' : ''}${modifier}`;
+                }
+
+                resultDiv.innerHTML = `
+                    <div class="${critClass}">
+                        <div style="font-size: 0.9em; margin-bottom: 5px;">${rollType}</div>
+                        <div style="font-size: 1.5em;">
+                            🎲 ${d20Roll}${modifierText} = <span style="color: white;">${total}</span>
+                        </div>
+                        ${d20Roll === 20 ? '<div style="font-size: 0.8em; margin-top: 5px;">CRITICAL!</div>' : ''}
+                        ${d20Roll === 1 ? '<div style="font-size: 0.8em; margin-top: 5px;">FUMBLE!</div>' : ''}
+                        ${extraText ? `<div style="font-size: 0.8em; margin-top: 5px;">${extraText}</div>` : ''}
+                    </div>
+                `;
+                
+                document.body.appendChild(resultDiv);
+                
+                // Remove after animation
+                setTimeout(() => {
+                    if (document.body.contains(resultDiv)) {
+                        document.body.removeChild(resultDiv);
+                    }
+                }, 2000);
+            },
+
+            addToRollHistory(rollType, d20Roll, modifier, total) {
+                const timestamp = new Date().toLocaleTimeString();
+                const entry = {
+                    type: rollType,
+                    d20: d20Roll,
+                    modifier: modifier,
+                    total: total,
+                    time: timestamp
+                };
+                
+                this.rollHistory.unshift(entry);
+                if (this.rollHistory.length > 10) {
+                    this.rollHistory.pop();
+                }
+                
+                this.updateRollHistoryDisplay();
+            },
+
+            updateRollHistoryDisplay() {
+                const container = document.getElementById('dice-log-entries');
+                container.innerHTML = this.rollHistory.map(roll => `
+                    <div class="dice-log-entry">
+                        <div>
+                            <div style="font-weight: bold;">${roll.type}</div>
+                            <div class="roll-details">🎲 ${roll.d20} ${roll.modifier >= 0 ? '+' : ''}${roll.modifier} • ${roll.time}</div>
+                        </div>
+                        <div class="roll-total">${roll.total}</div>
+                    </div>
+                `).join('');
+            },
+
+            toggleDiceLog() {
+                const panel = document.getElementById('dice-log-panel');
+                panel.classList.toggle('active');
+            },
+
+            clearDiceLog() {
+                this.rollHistory = [];
+                this.updateRollHistoryDisplay();
+            },
+
+            formatModifier(modifier) {
+                return modifier >= 0 ? `+${modifier}` : `${modifier}`;
+            },
+
+            updateDisplay() {
+                const char = this.data.character;
+                
+                // Header
+                document.getElementById('character-name').textContent = char.name;
+                document.getElementById('character-subtitle').textContent = 
+                    `Level ${char.level} ${char.class} • ${char.alignment}`;
+                
+                // Vital stats
+                document.getElementById('hp-display').textContent = 
+                    `${char.hp.current}/${char.hp.max}`;
+                document.getElementById('ac-display').textContent = char.ac;
+                document.getElementById('speed-display').textContent = char.speed;
+                
+                // HP bar
+                const hpPercent = (char.hp.current / char.hp.max) * 100;
+                document.getElementById('hp-bar').style.width = `${hpPercent}%`;
+                
+                // HP status color
+                const hpDisplay = document.getElementById('hp-display');
+                hpDisplay.className = hpPercent > 50 ? 'vital-value status-good' : 
+                                     hpPercent > 25 ? 'vital-value status-warning' : 
+                                     'vital-value status-danger';
+                
+                // Abilities
+                Object.entries(char.abilities).forEach(([ability, score]) => {
+                    const modifier = this.calculateModifier(score);
+                    const element = document.getElementById(`${ability}-display`);
+                    if (element) {
+                        element.textContent = `${score} (${this.formatModifier(modifier)})`;
+                    }
+                });
+                
+                // Combat stats
+                const dexMod = this.calculateModifier(char.abilities.dex);
+                const profBonus = Math.ceil(char.level / 4) + 1;
+                
+                document.getElementById('init-display').textContent = this.formatModifier(dexMod);
+                document.getElementById('prof-display').textContent = this.formatModifier(profBonus);
+                
+                // Hit Dice
+                document.getElementById('hd-display').textContent = 
+                    `${char.hitDice.current}/${char.hitDice.max} ${char.hitDice.type}`;
+                
+                // Death Saves - use setTimeout to ensure DOM elements exist
+                setTimeout(() => {
+                    this.updateDeathSaves();
+                    this.updateConditionsDisplay();
+                    this.updateInspirationDisplay();
+                    this.updateConcentrationDisplay();
+                    this.updateNotesDisplay();
+                }, 0);
+            },
+
+            updateInspirationDisplay() {
+                const inspirationDot = document.getElementById('inspiration-dot');
+                if (inspirationDot) {
+                    if (this.data.character.inspiration) {
+                        inspirationDot.classList.add('active');
+                    } else {
+                        inspirationDot.classList.remove('active');
+                    }
+                }
+            },
+
+            updateConcentrationDisplay() {
+                const concentrationSpell = document.getElementById('concentration-spell');
+                const concentrationBtn = document.getElementById('concentration-btn');
+                const endConcentrationBtn = document.getElementById('end-concentration-btn');
+                
+                if (concentrationSpell) {
+                    if (this.data.character.concentration.active) {
+                        concentrationSpell.textContent = this.data.character.concentration.spell;
+                        concentrationSpell.classList.add('concentration-active');
+                        if (concentrationBtn) concentrationBtn.style.display = 'inline-block';
+                        if (endConcentrationBtn) endConcentrationBtn.style.display = 'inline-block';
+                    } else {
+                        concentrationSpell.textContent = 'None';
+                        concentrationSpell.classList.remove('concentration-active');
+                        if (concentrationBtn) concentrationBtn.style.display = 'none';
+                        if (endConcentrationBtn) endConcentrationBtn.style.display = 'none';
+                    }
+                }
+            },
+
+            updateConditionsDisplay() {
+                const conditionsDisplay = document.getElementById('conditions-display');
+                if (conditionsDisplay) {
+                    const conditions = this.data.character.conditions;
+                    
+                    if (conditions.length === 0) {
+                        conditionsDisplay.innerHTML = '<div class="condition-item">No active conditions</div>';
+                    } else {
+                        conditionsDisplay.innerHTML = conditions.map(condition => `
+                            <div class="condition-item active">
+                                ${condition}
+                                <button class="condition-remove" onclick="event.stopPropagation(); Dashboard.toggleCondition('${condition}')" title="Remove condition">×</button>
+                            </div>
+                        `).join('');
+                    }
+                }
+            },
+
+            updateNotesDisplay() {
+                const notesPreview = document.getElementById('notes-preview');
+                if (notesPreview) {
+                    const notes = this.data.character.notes;
+                    const allNotes = [notes.session, notes.character, notes.plot].filter(note => note.trim());
+                    
+                    if (allNotes.length === 0) {
+                        notesPreview.innerHTML = '<div class="note-item empty">Click to add session notes...</div>';
+                    } else {
+                        notesPreview.innerHTML = allNotes.slice(0, 3).map(note => `
+                            <div class="note-item">${note.substring(0, 50)}${note.length > 50 ? '...' : ''}</div>
+                        `).join('');
+                    }
+                }
+            },
+
+            editSection(section) {
+                console.log('Opening edit for:', section);
+                
+                const modal = document.getElementById('edit-modal');
+                const title = document.getElementById('edit-title');
+                const content = document.getElementById('edit-content');
+                
+                title.textContent = `Edit ${section.charAt(0).toUpperCase() + section.slice(1)}`;
+                content.innerHTML = this.generateEditForm(section);
+                modal.classList.add('active');
+            },
+
+            generateEditForm(section) {
+                const char = this.data.character;
+                
+                switch(section) {
+                    case 'vitals':
+                        return `
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="edit-hp-max">Max HP</label>
+                                    <input type="number" id="edit-hp-max" value="${char.hp.max}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-hp-current">Current HP</label>
+                                    <input type="number" id="edit-hp-current" value="${char.hp.current}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-ac">Armor Class</label>
+                                    <input type="number" id="edit-ac" value="${char.ac}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-speed">Speed</label>
+                                    <input type="number" id="edit-speed" value="${char.speed}">
+                                </div>
+                            </div>
+                        `;
+                    
+                    case 'abilities':
+                        return `
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="edit-str">Strength</label>
+                                    <input type="number" id="edit-str" value="${char.abilities.str}" min="1" max="30">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-dex">Dexterity</label>
+                                    <input type="number" id="edit-dex" value="${char.abilities.dex}" min="1" max="30">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-con">Constitution</label>
+                                    <input type="number" id="edit-con" value="${char.abilities.con}" min="1" max="30">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="edit-int">Intelligence</label>
+                                    <input type="number" id="edit-int" value="${char.abilities.int}" min="1" max="30">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-wis">Wisdom</label>
+                                    <input type="number" id="edit-wis" value="${char.abilities.wis}" min="1" max="30">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-cha">Charisma</label>
+                                    <input type="number" id="edit-cha" value="${char.abilities.cha}" min="1" max="30">
+                                </div>
+                            </div>
+                        `;
+                    
+                    case 'combat':
+                        return `
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="edit-name">Character Name</label>
+                                    <input type="text" id="edit-name" value="${char.name}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-class">Class</label>
+                                    <input type="text" id="edit-class" value="${char.class}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-level">Level</label>
+                                    <input type="number" id="edit-level" value="${char.level}" min="1" max="20">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="edit-hd-max">Max Hit Dice</label>
+                                    <input type="number" id="edit-hd-max" value="${char.hitDice.max}" min="1" max="20">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-hd-current">Current Hit Dice</label>
+                                    <input type="number" id="edit-hd-current" value="${char.hitDice.current}" min="0" max="20">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-hd-type">Hit Die Type</label>
+                                    <select id="edit-hd-type">
+                                        <option value="d6" ${char.hitDice.type === 'd6' ? 'selected' : ''}>d6</option>
+                                        <option value="d8" ${char.hitDice.type === 'd8' ? 'selected' : ''}>d8</option>
+                                        <option value="d10" ${char.hitDice.type === 'd10' ? 'selected' : ''}>d10</option>
+                                        <option value="d12" ${char.hitDice.type === 'd12' ? 'selected' : ''}>d12</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Saving Throw Proficiencies</label>
+                                <div class="skill-list">
+                                    <div class="skill-item">
+                                        <input type="checkbox" class="skill-checkbox" id="save-str" ${char.saves?.str ? 'checked' : ''}>
+                                        <label for="save-str">Strength</label>
+                                    </div>
+                                    <div class="skill-item">
+                                        <input type="checkbox" class="skill-checkbox" id="save-dex" ${char.saves?.dex ? 'checked' : ''}>
+                                        <label for="save-dex">Dexterity</label>
+                                    </div>
+                                    <div class="skill-item">
+                                        <input type="checkbox" class="skill-checkbox" id="save-con" ${char.saves?.con ? 'checked' : ''}>
+                                        <label for="save-con">Constitution</label>
+                                    </div>
+                                    <div class="skill-item">
+                                        <input type="checkbox" class="skill-checkbox" id="save-int" ${char.saves?.int ? 'checked' : ''}>
+                                        <label for="save-int">Intelligence</label>
+                                    </div>
+                                    <div class="skill-item">
+                                        <input type="checkbox" class="skill-checkbox" id="save-wis" ${char.saves?.wis ? 'checked' : ''}>
+                                        <label for="save-wis">Wisdom</label>
+                                    </div>
+                                    <div class="skill-item">
+                                        <input type="checkbox" class="skill-checkbox" id="save-cha" ${char.saves?.cha ? 'checked' : ''}>
+                                        <label for="save-cha">Charisma</label>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    
+                    case 'skills':
+                        return `
+                            <div class="form-group">
+                                <label>Skill Proficiencies</label>
+                                <div class="skill-list">
+                                    <div class="skill-item">
+                                        <input type="checkbox" class="skill-checkbox" id="skill-athletics" ${char.skills?.athletics ? 'checked' : ''}>
+                                        <label for="skill-athletics">Athletics (STR)</label>
+                                    </div>
+                                    <div class="skill-item">
+                                        <input type="checkbox" class="skill-checkbox" id="skill-acrobatics" ${char.skills?.acrobatics ? 'checked' : ''}>
+                                        <label for="skill-acrobatics">Acrobatics (DEX)</label>
+                                    </div>
+                                    <div class="skill-item">
+                                        <input type="checkbox" class="skill-checkbox" id="skill-stealth" ${char.skills?.stealth ? 'checked' : ''}>
+                                        <label for="skill-stealth">Stealth (DEX)</label>
+                                    </div>
+                                    <div class="skill-item">
+                                        <input type="checkbox" class="skill-checkbox" id="skill-insight" ${char.skills?.insight ? 'checked' : ''}>
+                                        <label for="skill-insight">Insight (WIS)</label>
+                                    </div>
+                                    <div class="skill-item">
+                                        <input type="checkbox" class="skill-checkbox" id="skill-perception" ${char.skills?.perception ? 'checked' : ''}>
+                                        <label for="skill-perception">Perception (WIS)</label>
+                                    </div>
+                                    <div class="skill-item">
+                                        <input type="checkbox" class="skill-checkbox" id="skill-intimidation" ${char.skills?.intimidation ? 'checked' : ''}>
+                                        <label for="skill-intimidation">Intimidation (CHA)</label>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    
+                    case 'spells':
+                        return `
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="edit-spell-ability">Spellcasting Ability</label>
+                                    <select id="edit-spell-ability">
+                                        <option value="none" ${char.spells?.ability === 'none' ? 'selected' : ''}>None</option>
+                                        <option value="int" ${char.spells?.ability === 'int' ? 'selected' : ''}>Intelligence</option>
+                                        <option value="wis" ${char.spells?.ability === 'wis' ? 'selected' : ''}>Wisdom</option>
+                                        <option value="cha" ${char.spells?.ability === 'cha' ? 'selected' : ''}>Charisma</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Spell Slots</label>
+                                <div class="spell-slots">
+                                    <div class="slot-group">
+                                        <label for="edit-slots-1">1st Level</label>
+                                        <input type="number" id="edit-slots-1" value="${char.spells?.slots?.[1] || 0}" min="0">
+                                    </div>
+                                    <div class="slot-group">
+                                        <label for="edit-slots-2">2nd Level</label>
+                                        <input type="number" id="edit-slots-2" value="${char.spells?.slots?.[2] || 0}" min="0">
+                                    </div>
+                                    <div class="slot-group">
+                                        <label for="edit-slots-3">3rd Level</label>
+                                        <input type="number" id="edit-slots-3" value="${char.spells?.slots?.[3] || 0}" min="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-spells-known">Spells Known</label>
+                                <textarea id="edit-spells-known" rows="6" placeholder="List your spells here...">${char.spells?.known?.join('\\n') || ''}</textarea>
+                            </div>
+                        `;
+                    
+                    case 'conditions':
+                        const commonConditions = [
+                            'Blinded', 'Charmed', 'Deafened', 'Frightened', 'Grappled', 'Incapacitated',
+                            'Invisible', 'Paralyzed', 'Petrified', 'Poisoned', 'Prone', 'Restrained',
+                            'Stunned', 'Unconscious', 'Exhausted'
+                        ];
+                        
+                        return `
+                            <div class="form-group">
+                                <label>Inspiration</label>
+                                <div class="skill-item">
+                                    <input type="checkbox" class="skill-checkbox" id="edit-inspiration" ${char.inspiration ? 'checked' : ''}>
+                                    <label for="edit-inspiration">Has Inspiration</label>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Concentration</label>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="edit-concentration-spell">Spell/Effect</label>
+                                        <input type="text" id="edit-concentration-spell" value="${char.concentration?.spell || ''}" placeholder="Enter spell name">
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="checkbox" class="skill-checkbox" id="edit-concentration-active" ${char.concentration?.active ? 'checked' : ''}>
+                                        <label for="edit-concentration-active">Currently Concentrating</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Active Conditions</label>
+                                <div class="conditions-grid">
+                                    ${commonConditions.map(condition => `
+                                        <div class="condition-toggle ${char.conditions?.includes(condition) ? 'active' : ''}" onclick="this.classList.toggle('active'); this.querySelector('input').checked = !this.querySelector('input').checked;">
+                                            <input type="checkbox" class="condition-checkbox" value="${condition}" ${char.conditions?.includes(condition) ? 'checked' : ''} style="display: none;">
+                                            <span>${condition}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    
+                    case 'notes':
+                        return `
+                            <div class="form-group">
+                                <label for="edit-session-notes">Session Notes</label>
+                                <textarea id="edit-session-notes" class="notes-textarea" placeholder="Keep track of what happened this session...">${char.notes?.session || ''}</textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="edit-character-notes">Character Notes</label>
+                                <textarea id="edit-character-notes" class="notes-textarea" placeholder="Character backstory, goals, relationships...">${char.notes?.character || ''}</textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="edit-plot-notes">Plot & Reminders</label>
+                                <textarea id="edit-plot-notes" class="notes-textarea" placeholder="Important NPCs, plot threads, things to remember...">${char.notes?.plot || ''}</textarea>
+                            </div>
+                        `;
+                    
+                    case 'equipment':
+                        const equipmentHTML = char.equipment?.map((item, index) => `
+                            <div class="equipment-item">
+                                <input type="text" placeholder="Item name" value="${item.name}" data-field="name" data-index="${index}" style="width: 200px;">
+                                <input type="number" placeholder="Qty" value="${item.quantity}" data-field="quantity" data-index="${index}" style="width: 60px;">
+                                <input type="text" placeholder="Weight" value="${item.weight}" data-field="weight" data-index="${index}" style="width: 80px;">
+                                <input type="text" placeholder="Notes" value="${item.notes}" data-field="notes" data-index="${index}" style="flex: 1;">
+                                <button class="remove-btn" onclick="Dashboard.removeEquipment(${index})">🗑</button>
+                            </div>
+                        `).join('') || '';
+                        
+                        return `
+                            <div class="form-group">
+                                <label>Equipment</label>
+                                <div class="equipment-list" id="equipment-list">
+                                    ${equipmentHTML}
+                                </div>
+                                <button class="add-btn" onclick="Dashboard.addEquipment()">+ Add Equipment</button>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="edit-cp">Copper</label>
+                                    <input type="number" id="edit-cp" value="${char.currency?.cp || 0}" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-sp">Silver</label>
+                                    <input type="number" id="edit-sp" value="${char.currency?.sp || 0}" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-gp">Gold</label>
+                                    <input type="number" id="edit-gp" value="${char.currency?.gp || 0}" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-pp">Platinum</label>
+                                    <input type="number" id="edit-pp" value="${char.currency?.pp || 0}" min="0">
+                                </div>
+                            </div>
+                        `;
+                    
+                    default:
+                        return '<p>Section content will be added here.</p>';
+                }
+            },
+
+            saveEdit() {
+                const char = this.data.character;
+                const inputs = document.querySelectorAll('#edit-content input, #edit-content select, #edit-content textarea');
+                
+                inputs.forEach(input => {
+                    const id = input.id.replace('edit-', '');
+                    
+                    if (input.type === 'checkbox') {
+                        const checked = input.checked;
+                        
+                        if (input.id.startsWith('skill-')) {
+                            const skillName = input.id.replace('skill-', '');
+                            if (!char.skills) char.skills = {};
+                            char.skills[skillName] = checked;
+                        } else if (input.id.startsWith('save-')) {
+                            const saveName = input.id.replace('save-', '');
+                            if (!char.saves) char.saves = {};
+                            char.saves[saveName] = checked;
+                        } else if (input.id === 'edit-inspiration') {
+                            char.inspiration = checked;
+                        } else if (input.id === 'edit-concentration-active') {
+                            if (!char.concentration) char.concentration = {};
+                            char.concentration.active = checked;
+                        }
+                        return;
+                    }
+                    
+                    let value = input.type === 'number' ? parseInt(input.value) || 0 : input.value;
+                    
+                    if (input.dataset.field && input.dataset.index !== undefined) {
+                        const index = parseInt(input.dataset.index);
+                        const field = input.dataset.field;
+                        if (char.equipment && char.equipment[index]) {
+                            char.equipment[index][field] = value;
+                        }
+                        return;
+                    }
+                    
+                    if (id.includes('-')) {
+                        const parts = id.split('-');
+                        if (parts[0] === 'hp') {
+                            if (!char.hp) char.hp = {};
+                            char.hp[parts[1]] = value;
+                        } else if (parts[0] === 'hd') {
+                            if (!char.hitDice) char.hitDice = {};
+                            char.hitDice[parts[1]] = value;
+                        } else if (parts[0] === 'slots') {
+                            if (!char.spells) char.spells = { slots: {} };
+                            char.spells.slots[parseInt(parts[1])] = value;
+                        } else if (parts[0] === 'spell') {
+                            if (!char.spells) char.spells = {};
+                            char.spells[parts[1]] = value;
+                        }
+                    } else if (['cp', 'sp', 'gp', 'pp'].includes(id)) {
+                        if (!char.currency) char.currency = {};
+                        char.currency[id] = value;
+                    } else if (char.abilities && char.abilities.hasOwnProperty(id)) {
+                        char.abilities[id] = value;
+                    } else if (id === 'spells-known') {
+                        if (!char.spells) char.spells = {};
+                        char.spells.known = value.split('\n').filter(spell => spell.trim());
+                    } else if (id === 'concentration-spell') {
+                        if (!char.concentration) char.concentration = {};
+                        char.concentration.spell = value;
+                    } else if (id === 'session-notes') {
+                        if (!char.notes) char.notes = {};
+                        char.notes.session = value;
+                    } else if (id === 'character-notes') {
+                        if (!char.notes) char.notes = {};
+                        char.notes.character = value;
+                    } else if (id === 'plot-notes') {
+                        if (!char.notes) char.notes = {};
+                        char.notes.plot = value;
+                    } else if (['name', 'class', 'level', 'alignment', 'ac', 'speed'].includes(id)) {
+                        char[id] = value;
+                    }
+                });
+                
+                // Handle condition checkboxes
+                const conditionCheckboxes = document.querySelectorAll('.condition-checkbox');
+                char.conditions = [];
+                conditionCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        char.conditions.push(checkbox.value);
+                    }
+                });
+                
+                this.updateDisplay();
+                this.closeEdit();
+                this.save();
+            },
+
+            closeEdit() {
+                document.getElementById('edit-modal').classList.remove('active');
+            },
+
+            uploadImage() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            this.data.character.image = e.target.result;
+                            this.updateCharacterImage();
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
+                input.click();
+            },
+
+            updateCharacterImage() {
+                const container = document.getElementById('character-image-container');
+                if (this.data.character.image) {
+                    container.innerHTML = `<img src="${this.data.character.image}" alt="Character" class="character-image" onclick="Dashboard.uploadImage()">`;
+                } else {
+                    container.innerHTML = '📷';
+                    container.className = 'character-image-placeholder';
+                }
+            },
+
+            addEquipment() {
+                this.data.character.equipment = this.data.character.equipment || [];
+                this.data.character.equipment.push({
+                    name: '',
+                    quantity: 1,
+                    weight: '',
+                    notes: ''
+                });
+                
+                const content = document.getElementById('edit-content');
+                content.innerHTML = this.generateEditForm('equipment');
+            },
+
+            removeEquipment(index) {
+                this.data.character.equipment.splice(index, 1);
+                const content = document.getElementById('edit-content');
+                content.innerHTML = this.generateEditForm('equipment');
+            },
+
+            toggleTheme() {
+                document.body.classList.toggle('dark-theme');
+            },
+
+            loadTemplate() {
+                this.data.character = {
+                    name: 'Zephyr Lightbringer',
+                    class: 'Cleric',
+                    level: 1,
+                    alignment: 'Lawful Good',
+                    image: null,
+                    hp: { current: 9, max: 9, temp: 0 },
+                    ac: 15,
+                    speed: 30,
+                    abilities: {
+                        str: 13, dex: 12, con: 15,
+                        int: 10, wis: 16, cha: 14
+                    },
+                    hitDice: {
+                        current: 1,
+                        max: 1,
+                        type: 'd8'
+                    },
+                    deathSaves: {
+                        successes: 0,
+                        failures: 0
+                    },
+                    skills: {
+                        insight: true,
+                        perception: true
+                    },
+                    saves: {
+                        wis: true,
+                        cha: true
+                    },
+                    spells: {
+                        ability: 'wis',
+                        slots: { 1: 2, 2: 0, 3: 0 },
+                        known: ['Cure Wounds', 'Guiding Bolt', 'Sacred Flame']
+                    },
+                    equipment: [
+                        { name: 'Mace', quantity: 1, weight: '4 lb', notes: '1d6 bludgeoning' },
+                        { name: 'Scale Mail', quantity: 1, weight: '45 lb', notes: 'AC 14 + Dex mod (max 2)' },
+                        { name: 'Shield', quantity: 1, weight: '6 lb', notes: '+2 AC' }
+                    ],
+                    currency: { cp: 0, sp: 0, gp: 25, pp: 0 }
+                };
+                this.updateDisplay();
+            },
+
+            save() {
+                console.log('Character saved:', this.data.character);
+                const saveBtn = document.querySelector('.quick-actions .btn');
+                const originalText = saveBtn.textContent;
+                saveBtn.textContent = '✓ Saved';
+                saveBtn.style.background = 'var(--success)';
+                
+                setTimeout(() => {
+                    saveBtn.textContent = originalText;
+                    saveBtn.style.background = '';
+                }, 1500);
+            },
+
+            exportData() {
+                const char = this.data.character;
+                
+                // Helper function to center text
+                const centerText = (text, width = 60) => {
+                    const padding = Math.max(0, Math.floor((width - text.length) / 2));
+                    return ' '.repeat(padding) + text;
+                };
+                
+                // Helper function to center a line with borders
+                const centerLine = (text, width = 60) => {
+                    const contentWidth = width - 4; // Account for border spaces
+                    const padding = Math.max(0, Math.floor((contentWidth - text.length) / 2));
+                    const leftPad = ' '.repeat(padding);
+                    const rightPad = ' '.repeat(contentWidth - text.length - padding);
+                    return `  ${leftPad}${text}${rightPad}  `;
+                };
+                
+                // Create a human-readable character sheet
+                let output = '═'.repeat(60) + '\n';
+                output += centerLine(char.name.toUpperCase()) + '\n';
+                output += centerLine(`Level ${char.level} ${char.class} • ${char.alignment}`) + '\n';
+                output += '═'.repeat(60) + '\n\n';
+
+                // Vital Stats
+                output += centerText('VITAL STATISTICS') + '\n';
+                output += centerText('─'.repeat(16)) + '\n';
+                output += centerText(`Hit Points: ${char.hp.current}/${char.hp.max}`) + '\n';
+                output += centerText(`Armor Class: ${char.ac}`) + '\n';
+                output += centerText(`Speed: ${char.speed} ft`) + '\n';
+                output += centerText(`Hit Dice: ${char.hitDice.current}/${char.hitDice.max} ${char.hitDice.type}`) + '\n\n';
+
+                // Ability Scores
+                output += centerText('ABILITY SCORES') + '\n';
+                output += centerText('─'.repeat(14)) + '\n';
+                Object.entries(char.abilities).forEach(([ability, score]) => {
+                    const modifier = this.calculateModifier(score);
+                    const line = `${ability.toUpperCase()}: ${score} (${this.formatModifier(modifier)})`;
+                    output += centerText(line) + '\n';
+                });
+                output += '\n';
+
+                // Combat Stats
+                const dexMod = this.calculateModifier(char.abilities.dex);
+                const profBonus = Math.ceil(char.level / 4) + 1;
+                output += centerText('COMBAT') + '\n';
+                output += centerText('─'.repeat(6)) + '\n';
+                output += centerText(`Initiative: ${this.formatModifier(dexMod)}`) + '\n';
+                output += centerText(`Proficiency Bonus: ${this.formatModifier(profBonus)}`) + '\n';
+                
+                // Saving Throws
+                if (char.saves && Object.keys(char.saves).length > 0) {
+                    output += '\n' + centerText('Saving Throws (Proficient):') + '\n';
+                    Object.entries(char.saves).forEach(([save, proficient]) => {
+                        if (proficient) {
+                            const abilityMod = this.calculateModifier(char.abilities[save]);
+                            const total = abilityMod + profBonus;
+                            output += centerText(`${save.toUpperCase()}: ${this.formatModifier(total)}`) + '\n';
+                        }
+                    });
+                }
+                output += '\n';
+
+                // Skills
+                if (char.skills && Object.keys(char.skills).length > 0) {
+                    output += centerText('SKILLS (PROFICIENT)') + '\n';
+                    output += centerText('─'.repeat(19)) + '\n';
+                    Object.entries(char.skills).forEach(([skill, proficient]) => {
+                        if (proficient) {
+                            // Calculate skill modifier based on ability
+                            let abilityMod = 0;
+                            switch(skill) {
+                                case 'athletics': abilityMod = this.calculateModifier(char.abilities.str); break;
+                                case 'acrobatics': case 'stealth': abilityMod = this.calculateModifier(char.abilities.dex); break;
+                                case 'insight': case 'perception': abilityMod = this.calculateModifier(char.abilities.wis); break;
+                                case 'intimidation': abilityMod = this.calculateModifier(char.abilities.cha); break;
+                                default: abilityMod = 0;
+                            }
+                            const total = abilityMod + profBonus;
+                            const skillName = skill.charAt(0).toUpperCase() + skill.slice(1);
+                            output += centerText(`${skillName}: ${this.formatModifier(total)}`) + '\n';
+                        }
+                    });
+                    output += '\n';
+                }
+
+                // Status & Conditions
+                output += centerText('STATUS') + '\n';
+                output += centerText('─'.repeat(6)) + '\n';
+                output += centerText(`Inspiration: ${char.inspiration ? 'YES' : 'No'}`) + '\n';
+                
+                if (char.concentration && char.concentration.active) {
+                    output += centerText(`Concentrating on: ${char.concentration.spell}`) + '\n';
+                } else {
+                    output += centerText('Concentration: None') + '\n';
+                }
+                
+                if (char.conditions && char.conditions.length > 0) {
+                    output += centerText(`Conditions: ${char.conditions.join(', ')}`) + '\n';
+                } else {
+                    output += centerText('Conditions: None') + '\n';
+                }
+                
+                if (char.deathSaves && (char.deathSaves.successes > 0 || char.deathSaves.failures > 0)) {
+                    output += centerText(`Death Saves: ${char.deathSaves.successes} successes, ${char.deathSaves.failures} failures`) + '\n';
+                }
+                output += '\n';
+
+                // Spells (if any)
+                if (char.spells && char.spells.ability && char.spells.ability !== 'none') {
+                    output += centerText('SPELLCASTING') + '\n';
+                    output += centerText('─'.repeat(12)) + '\n';
+                    output += centerText(`Spellcasting Ability: ${char.spells.ability.toUpperCase()}`) + '\n';
+                    
+                    // Spell slots
+                    const activeSlots = Object.entries(char.spells.slots || {}).filter(([level, slots]) => slots > 0);
+                    if (activeSlots.length > 0) {
+                        output += '\n' + centerText('Spell Slots:') + '\n';
+                        activeSlots.forEach(([level, slots]) => {
+                            const levelName = level === '1' ? '1st' : level === '2' ? '2nd' : level === '3' ? '3rd' : `${level}th`;
+                            output += centerText(`${levelName} Level: ${slots}`) + '\n';
+                        });
+                    }
+                    
+                    // Known spells
+                    if (char.spells.known && char.spells.known.length > 0) {
+                        output += '\n' + centerText('Known Spells:') + '\n';
+                        char.spells.known.forEach(spell => {
+                            output += centerText(`• ${spell}`) + '\n';
+                        });
+                    }
+                    output += '\n';
+                }
+
+                // Equipment
+                if (char.equipment && char.equipment.length > 0) {
+                    output += centerText('EQUIPMENT') + '\n';
+                    output += centerText('─'.repeat(9)) + '\n';
+                    char.equipment.forEach(item => {
+                        let line = `• ${item.name}`;
+                        if (item.quantity && item.quantity > 1) {
+                            line += ` (${item.quantity})`;
+                        }
+                        if (item.notes) {
+                            line += ` - ${item.notes}`;
+                        }
+                        output += centerText(line) + '\n';
+                    });
+                    output += '\n';
+                }
+
+                // Currency
+                const activeCurrency = Object.entries(char.currency || {}).filter(([type, amount]) => amount > 0);
+                if (activeCurrency.length > 0) {
+                    output += centerText('CURRENCY') + '\n';
+                    output += centerText('─'.repeat(8)) + '\n';
+                    activeCurrency.forEach(([type, amount]) => {
+                        const currencyName = type === 'cp' ? 'Copper' : type === 'sp' ? 'Silver' : 
+                                           type === 'gp' ? 'Gold' : 'Platinum';
+                        output += centerText(`${currencyName}: ${amount} ${type}`) + '\n';
+                    });
+                    output += '\n';
+                }
+
+                // Notes
+                const allNotes = [
+                    { title: 'Character Notes', content: char.notes?.character },
+                    { title: 'Session Notes', content: char.notes?.session },
+                    { title: 'Plot & Reminders', content: char.notes?.plot }
+                ].filter(note => note.content && note.content.trim());
+
+                if (allNotes.length > 0) {
+                    output += centerText('NOTES') + '\n';
+                    output += centerText('─'.repeat(5)) + '\n';
+                    allNotes.forEach(note => {
+                        output += centerText(`${note.title}:`) + '\n';
+                        // For notes, we'll center each line individually
+                        const lines = note.content.trim().split('\n');
+                        lines.forEach(line => {
+                            if (line.trim()) {
+                                output += centerText(line.trim()) + '\n';
+                            }
+                        });
+                        output += '\n';
+                    });
+                }
+
+                output += '\n' + '═'.repeat(60) + '\n';
+                output += centerText('Generated by D&D 5e Character Dashboard') + '\n';
+                output += centerText(new Date().toLocaleDateString()) + '\n';
+                output += '═'.repeat(60);
+
+                // Export as text file
+                const blob = new Blob([output], {
+                    type: 'text/plain'
+                });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${char.name.replace(/\s+/g, '_')}_character_sheet.txt`;
+                link.click();
+                URL.revokeObjectURL(url);
+            },
+
+            init() {
+                this.updateDisplay();
+                this.updateCharacterImage();
+                this.rollHistory = [];
+                
+                // Modal close on outside click
+                document.getElementById('edit-modal').addEventListener('click', (e) => {
+                    if (e.target.id === 'edit-modal') {
+                        this.closeEdit();
+                    }
+                });
+                
+                // Close dice log when clicking outside
+                document.addEventListener('click', (e) => {
+                    const diceWidget = document.querySelector('.dice-log-widget');
+                    const dicePanel = document.getElementById('dice-log-panel');
+                    
+                    if (!diceWidget.contains(e.target) && !dicePanel.contains(e.target)) {
+                        dicePanel.classList.remove('active');
+                    }
+                });
+                
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        this.closeEdit();
+                        document.getElementById('dice-log-panel').classList.remove('active');
+                    }
+                });
+            }
+        };
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Dashboard loading...');
+            Dashboard.init();
+            console.log('Dashboard ready!');
+        });
+    </script>
+</body>
+</html>
