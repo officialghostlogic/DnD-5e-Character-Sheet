@@ -1,198 +1,286 @@
-# DnD-5e-Character-Sheet
-Interactive Character Sheet
 # D&D 5e Character Dashboard
 
-A beautiful, comprehensive digital character sheet for Dungeons & Dragons 5th Edition that combines intuitive design with powerful functionality.
+A modern, interactive web-based character sheet for Dungeons & Dragons 5th Edition. Built with vanilla HTML, CSS, and JavaScript for maximum compatibility and ease of use.
 
-![Dashboard Preview](https://img.shields.io/badge/Status-Ready%20to%20Use-brightgreen) ![No Dependencies](https://img.shields.io/badge/Dependencies-None-blue) ![Cross Platform](https://img.shields.io/badge/Platform-Cross%20Platform-orange)
+![Character Dashboard Preview](https://via.placeholder.com/800x400/6b4423/f4f1e8?text=D%26D+5e+Character+Dashboard)
 
 ## ✨ Features
 
-### Core Character Management
-- **Complete ability scores** with automatic modifier calculations
-- **Hit points tracking** with visual health bar
-- **Armor class, speed, and initiative** display
-- **Hit dice management** with healing rolls and long rest recovery
-- **Death saving throws** with interactive success/failure tracking
+### 🎲 Interactive Dice Rolling
+- **One-click dice rolls** for ability checks, skills, saves, and combat
+- **Visual roll results** with critical hit/fumble detection
+- **Roll history tracker** with floating widget
+- **Animated roll popups** with customizable settings
 
-### Advanced Mechanics
-- **🎲 Integrated dice rolling** for all abilities, skills, and saves
-- **✨ Inspiration tracking** with visual indicator
-- **🧠 Concentration checker** with automatic save calculations
-- **🔥 Conditions tracker** for all 15 core D&D conditions
-- **📝 Notes system** for session notes, character backstory, and plot reminders
+### 📊 Complete Character Management
+- **Vital Statistics**: HP tracking with visual bar, AC, speed
+- **Ability Scores**: All six abilities with modifier calculation
+- **Combat Tracking**: Initiative, proficiency, hit dice, death saves
+- **Skills & Saves**: Proficiency tracking with auto-calculated bonuses
+- **Spellcasting**: Spell slots, known spells, concentration tracking
+- **Equipment**: Inventory management with currency tracking
+- **Conditions**: Status effect tracking with common D&D conditions
+- **Notes**: Session notes, character backstory, plot reminders
 
-### Combat & Skills
-- **Proficiency tracking** for skills and saving throws
-- **Initiative rolling** with DEX modifier
-- **Skill checks** with proper ability score bonuses
-- **Saving throw calculations** including proficiency bonuses
+### 🎨 Modern Design
+- **Glassmorphism UI** with elegant transparency effects
+- **Fantasy Theming** with custom fonts (Cinzel & Crimson Text)
+- **Responsive Layout** that works on desktop, tablet, and mobile
+- **Dark/Light Themes** with smooth transitions
+- **Hover Effects** and smooth animations throughout
 
-### Spellcasting Support
-- **Spell slot management** for all spell levels
-- **Known spells tracking**
-- **Spellcasting ability** configuration
-- **Spell attack bonus** calculations
+### ♿ Accessibility Features
+- **Font Size Controls** (Small, Normal, Large, Extra Large)
+- **High Contrast Mode** for improved visibility
+- **Reduced Motion** option for sensitive users
+- **Enhanced Keyboard Navigation** with tab support
+- **Mobile-Friendly Mode** with larger touch targets
+- **Screen Reader Compatible** with proper ARIA labels
 
-### Quality of Life
-- **🌙 Dark/Light theme** toggle
-- **📤 Character export** to human-readable text format
-- **📋 Character templates** for quick creation
-- **🎲 Dice roll history** with detailed logs
-- **📷 Character portraits** with image upload
+### 💾 Data Management
+- **Auto-Save** functionality (configurable)
+- **Export to Text** with beautifully formatted character sheets
+- **Template Loading** for quick character creation
+- **Local Storage** for session persistence
 
 ## 🚀 Getting Started
 
-### Quick Start (Recommended)
-1. **Download** the `dnd-dashboard.html` file
-2. **Double-click** to open in your web browser
-3. **Start playing** - no installation required!
+### Installation
+1. **Download** the HTML file
+2. **Open** in any modern web browser
+3. **Start playing!** No server or installation required
 
-### Alternative Methods
+### Basic Usage
+1. **Edit Sections**: Click any card to edit that section
+2. **Roll Dice**: Hover over stats to reveal dice buttons, or click to roll
+3. **Track Resources**: Use hit dice, death saves, and condition tracking
+4. **Take Notes**: Keep session and character notes organized
+5. **Export**: Save your character sheet as a formatted text file
 
-#### Option 1: Save from Browser
-1. Copy the complete HTML code
-2. Save as `dnd-dashboard.html` in any folder
-3. Open the file in your browser
+## 🎯 Core Sections
 
-#### Option 2: Online Hosting
-1. Upload the HTML file to any web host
-2. Share the URL with your D&D group
-3. Access from anywhere with internet
+### ⚡ Vital Stats
+- Current/Max HP with visual health bar
+- Armor Class and Speed tracking
+- Color-coded health status (green/yellow/red)
 
-#### Option 3: Local Server
-```bash
-# Simple Python server (if you have Python installed)
-python -m http.server 8000
-# Then visit http://localhost:8000
+### 💪 Ability Scores
+- All six D&D abilities (STR, DEX, CON, INT, WIS, CHA)
+- Automatic modifier calculation
+- One-click ability check rolling
+
+### ⚔️ Combat
+- Initiative tracking with DEX modifier
+- Proficiency bonus calculation
+- Hit dice management with healing rolls
+- Death saving throws with success/failure tracking
+- Saving throw proficiencies
+
+### 🎯 Skills & Saves
+- Skill proficiency tracking
+- Automatic bonus calculation
+- Quick skill check rolling
+- Saving throw proficiency management
+
+### ✨ Spells & Magic
+- Spellcasting ability selection
+- Spell slot tracking by level
+- Known spells list
+- Concentration tracking with save rolling
+
+### 🎒 Equipment
+- Item inventory with quantity, weight, and notes
+- Currency tracking (CP, SP, GP, PP)
+- Equipment notes for stats and special properties
+
+### 🔥 Conditions & Status
+- Inspiration tracking
+- Concentration management
+- Common D&D conditions (Blinded, Charmed, etc.)
+- Quick condition toggle interface
+
+### 📝 Notes & Reminders
+- Session notes for what happened
+- Character notes for backstory and personality
+- Plot reminders for important NPCs and threads
+
+## ⚙️ Settings & Customization
+
+### 🎨 Visual Settings
+- **Font Size**: 4 size options from small to extra-large
+- **High Contrast**: Black/white mode for visibility
+- **Reduced Motion**: Disables animations for accessibility
+
+### 🎲 Dice Settings
+- **Roll Sounds**: Audio feedback for dice rolls
+- **Auto-roll Hover**: Show/hide dice buttons on hover
+- **Roll Confirmation**: Confirm before rolling dice
+
+### 🖱️ Interaction Settings
+- **Click Feedback**: Visual button press feedback
+- **Keyboard Navigation**: Enhanced tab navigation
+- **Tooltip Delays**: Customizable hover delays
+
+### 📱 Mobile Settings
+- **Mobile-Friendly Mode**: Larger touch targets
+- **Swipe Navigation**: Gesture support (coming soon)
+
+### 💾 Data Settings
+- **Auto-Save**: Automatic change saving
+- **Export Format**: Text, JSON, or both
+
+## 🎮 Usage Tips
+
+### Efficient Workflow
+1. **Use Templates**: Start with the Cleric template and modify
+2. **Quick Rolls**: Hover over any stat to reveal dice buttons
+3. **Batch Editing**: Edit multiple sections at once
+4. **Export Regular**: Save character sheets after sessions
+
+### Combat Usage
+1. **Roll Initiative**: Click the dice button next to initiative
+2. **Track HP**: Click vital stats to quickly adjust HP
+3. **Death Saves**: Click dots to mark successes/failures
+4. **Conditions**: Toggle conditions as they're applied
+
+### Session Management
+1. **Notes**: Keep session notes updated during play
+2. **Resources**: Track hit dice and spell slots
+3. **Conditions**: Update status effects in real-time
+4. **Export**: Generate clean character sheets for records
+
+## 🔧 Technical Details
+
+### Browser Compatibility
+- **Chrome**: Full support (recommended)
+- **Firefox**: Full support
+- **Safari**: Full support
+- **Edge**: Full support
+- **Mobile Browsers**: Responsive design works on all platforms
+
+### Technologies Used
+- **HTML5**: Semantic markup
+- **CSS3**: Modern styling with custom properties
+- **Vanilla JavaScript**: No frameworks or dependencies
+- **Google Fonts**: Cinzel and Crimson Text typography
+- **Local Storage**: For settings and data persistence
+
+### File Structure
+```
+dnd-dashboard.html
+├── CSS (embedded)
+│   ├── Typography (Google Fonts)
+│   ├── Layout (Grid & Flexbox)
+│   ├── Theming (CSS Custom Properties)
+│   ├── Animations (Smooth transitions)
+│   └── Responsive (Mobile-first design)
+└── JavaScript (embedded)
+    ├── Character Data Management
+    ├── Dice Rolling System
+    ├── UI State Management
+    ├── Settings Persistence
+    └── Export Functionality
 ```
 
-## 🎯 How to Use
+## 🎲 Dice Rolling System
 
-### Creating Your Character
-1. **Click any card** to edit that section
-2. **Enter your stats** in the modal forms
-3. **Upload a portrait** by clicking the camera icon
-4. **Save your work** using the Save button
+### Supported Rolls
+- **Ability Checks**: d20 + ability modifier
+- **Skill Checks**: d20 + ability modifier + proficiency (if proficient)
+- **Saving Throws**: d20 + ability modifier + proficiency (if proficient)
+- **Initiative**: d20 + DEX modifier
+- **Hit Dice**: Hit die + CON modifier (minimum 1 HP)
+- **Death Saves**: d20 (special rules for nat 1/20)
+- **Concentration**: d20 + CON modifier + proficiency (if proficient)
 
-### During Play
-- **Click dice icons** (🎲) to roll checks, saves, and skills
-- **Track resources** like hit dice, spell slots, and HP
-- **Manage conditions** and concentration effects
-- **Take notes** during the session
+### Roll Features
+- **Critical Detection**: Automatic nat 1/20 highlighting
+- **Visual Feedback**: Animated popups with results
+- **Roll History**: Last 10 rolls tracked in floating widget
+- **Modifiers**: Automatic calculation based on character stats
 
-### Rolling Mechanics
-- **Ability checks**: d20 + ability modifier
-- **Skill checks**: d20 + ability modifier + proficiency (if applicable)
-- **Saving throws**: d20 + ability modifier + proficiency (if applicable)
-- **Hit dice**: Hit die + CON modifier (minimum 1 HP recovered)
-- **Death saves**: d20 vs DC 10 (nat 20 = recover 1 HP, nat 1 = 2 failures)
-- **Concentration**: d20 + CON modifier + proficiency vs DC 10 or half damage
+## 📤 Export Format
 
-### Character Export
-1. Click **"📤 Export"** button
-2. Downloads a beautifully formatted `.txt` file
-3. Perfect for sharing with DMs or printing as reference
+The export feature generates beautifully formatted text files:
 
-## 🎨 Interface Overview
+```
+════════════════════════════════════════════════════════════
+                         THORIN IRONFORGE                          
+                   Level 3 Fighter • Lawful Good                   
+════════════════════════════════════════════════════════════
 
-### Dashboard Cards
-- **⚡ Vital Stats**: HP, AC, Speed tracking
-- **💪 Ability Scores**: All six abilities with modifiers
-- **⚔️ Combat**: Initiative, hit dice, death saves
-- **🎯 Skills & Saves**: Proficiency tracking and rolling
-- **✨ Spells & Magic**: Spell slot and spellcasting management
-- **🎒 Equipment**: Inventory and currency tracking
-- **🔥 Conditions & Status**: Inspiration, concentration, conditions
-- **📝 Notes & Reminders**: Session and character notes
+                        VITAL STATISTICS                        
+                        ────────────────                        
+                     Hit Points: 28/28                     
+                      Armor Class: 18                      
+                        Speed: 25 ft                       
+                   Hit Dice: 3/3 d10                   
 
-### Interactive Elements
-- **Hover over ability scores** to reveal dice roll buttons
-- **Click condition dots** to toggle active effects
-- **Use mini-buttons** for quick actions like spending hit dice
-- **Access dice log** via the floating dice widget
+                        ABILITY SCORES                        
+                        ──────────────                        
+                      STR: 16 (+3)                      
+                      DEX: 13 (+1)                      
+                      CON: 15 (+2)                      
+                      INT: 10 (+0)                      
+                      WIS: 12 (+1)                      
+                      CHA: 8 (-1)                       
+```
 
-## 🛠️ Technical Details
+## 🤝 Contributing
 
-### Requirements
-- **Modern web browser** (Chrome, Firefox, Safari, Edge)
-- **JavaScript enabled**
-- **No internet connection** required after initial load
+This is a single-file web application designed for easy sharing and modification. To contribute:
 
-### Data Storage
-- Character data stored in **browser memory** during session
-- **Export feature** creates permanent text files
-- **No personal data** transmitted or stored externally
+1. **Fork** or download the HTML file
+2. **Make changes** directly in the file
+3. **Test** in multiple browsers
+4. **Share** your improvements
 
-### Compatibility
-- ✅ **Desktop browsers** (Windows, Mac, Linux)
-- ✅ **Mobile browsers** (iOS Safari, Android Chrome)
-- ✅ **Tablet optimized** responsive design
-- ✅ **Offline capable** once loaded
+### Feature Requests
+- Spell slot management improvements
+- Additional character classes
+- Custom dice rolling
+- PDF export functionality
+- Multiplayer session sharing
 
-## 🎲 D&D 5e Rule Accuracy
+## 📜 License
 
-This dashboard implements official D&D 5e mechanics:
-- **Proficiency bonus** scaling by level
-- **Ability score modifiers** calculated correctly
-- **Death saving throws** following exact rules
-- **Concentration saves** with proper DC calculation
-- **Hit dice recovery** on long rests (half maximum, minimum 1)
+This project is open source and available under the MIT License. Feel free to use, modify, and distribute as needed.
 
-## 🚧 Troubleshooting
+## 🎯 Roadmap
+
+### Coming Soon
+- **PDF Export**: Generate printer-friendly character sheets
+- **Custom Dice**: Support for weapon damage and custom rolls
+- **Character Builder**: Step-by-step character creation wizard
+- **Spell Database**: Integrated spell lookup and management
+- **Session Sync**: Share character data between devices
+
+### Future Features
+- **Campaign Management**: Link multiple characters
+- **Digital Dice**: 3D dice rolling animations
+- **Voice Commands**: Accessibility through speech recognition
+- **Tablet Mode**: Optimized interface for large tablets
+
+## 🆘 Support
 
 ### Common Issues
+- **Character name not showing**: Refresh the page and try again
+- **Dice not rolling**: Check that JavaScript is enabled
+- **Settings not saving**: Ensure local storage is enabled
+- **Mobile display issues**: Try mobile-friendly mode in settings
 
-**Dashboard won't load:**
-- Ensure JavaScript is enabled in your browser
-- Try opening in an incognito/private window
-- Check that the HTML file isn't corrupted
+### Getting Help
+For issues or questions:
+1. Check this README for common solutions
+2. Verify browser compatibility
+3. Try clearing browser cache and refreshing
+4. Test in a different browser
 
-**Dice rolls not working:**
-- Make sure you're clicking the dice (🎲) buttons, not the text
-- Try refreshing the page
+---
 
-**Export not downloading:**
-- Check your browser's download settings
-- Ensure pop-ups aren't blocked
+**Made for D&D players, by D&D players** 🐉
 
-**Mobile display issues:**
-- Try rotating to landscape mode for better layout
-- Use browser zoom controls if text is too small
-
-### Browser Support
-- **Chrome 80+** ✅ Fully supported
-- **Firefox 75+** ✅ Fully supported  
-- **Safari 13+** ✅ Fully supported
-- **Edge 80+** ✅ Fully supported
-
-## 🤝 Usage Tips
-
-### For Players
-- **Export regularly** to save character progress
-- **Use templates** for quick character creation
-- **Take session notes** in the Notes section
-- **Share exports** with your DM for reference
-
-### For DMs
-- **Quick reference** - ask players to share their exported sheets
-- **Combat tracking** - have players manage their own conditions
-- **Rule consistency** - dice rolls follow official 5e mechanics
-
-### For Groups
-- **Host online** for shared access during virtual sessions
-- **Mobile friendly** for in-person games with digital dice
-- **No accounts needed** - just share the file
-
-## 📄 License
-
-This project is open source and free to use for personal and group D&D games.
-
-## 🎮 Happy Gaming!
-
-Whether you're a new player learning the ropes or a veteran looking for a cleaner character sheet, this dashboard has everything you need for your D&D 5e adventures.
-
-**Roll for initiative!** 🎲✨
+*Happy adventuring!*
 
 ---
 
