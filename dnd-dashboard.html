@@ -1087,6 +1087,7 @@
                     <button class="btn secondary" onclick="Dashboard.toggleTheme()">🌙 Dark Mode</button>
                     <button class="btn secondary" onclick="Dashboard.openSettings()">⚙️ Settings</button>
                     <button class="btn secondary" onclick="Dashboard.loadTemplate()">📋 Templates</button>
+                    <button class="btn secondary" onclick="Dashboard.importFromFile()">📥 Import</button>
                     <button class="btn" onclick="Dashboard.save()">💾 Save</button>
                     <button class="btn secondary" onclick="Dashboard.exportData()">📤 Export</button>
                 </div>
@@ -1456,6 +1457,18 @@
                             <option value="json">JSON (.json)</option>
                             <option value="both">Both formats</option>
                         </select>
+                    </div>
+                    
+                    <div class="form-group" style="border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 15px;">
+                        <label>Data Management</label>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+                            <button class="btn secondary" onclick="Dashboard.exportToFile('json')" style="font-size: 12px; padding: 8px 12px;">📄 Export JSON</button>
+                            <button class="btn secondary" onclick="Dashboard.importFromFile()" style="font-size: 12px; padding: 8px 12px;">📥 Import JSON</button>
+                            <button class="btn secondary" onclick="if(confirm('Clear all saved data?')) Dashboard.clearLocalStorage()" style="font-size: 12px; padding: 8px 12px; background: var(--danger);">🗑 Clear Data</button>
+                        </div>
+                        <div style="font-size: 0.8em; opacity: 0.7; margin-top: 8px;">
+                            Data is automatically saved to your browser's local storage.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1849,7 +1862,124 @@
                 }, 2000);
             },
 
-            // Settings functionality
+            // Local Storage functionality
+            saveToLocalStorage() {
+                try {
+                    const saveData = {
+                        character: this.data.character,
+                        settings: this.data.settings,
+                        lastSaved: new Date().toISOString(),
+                        version: '1.0'
+                    };
+                    localStorage.setItem('dnd-character-dashboard', JSON.stringify(saveData));
+                    return true;
+                } catch (error) {
+                    console.error('Failed to save to localStorage:', error);
+                    return false;
+                }
+            },
+
+            loadFromLocalStorage() {
+                try {
+                    const saved = localStorage.getItem('dnd-character-dashboard');
+                    if (saved) {
+                        const saveData = JSON.parse(saved);
+                        
+                        // Merge saved data with defaults to handle version updates
+                        if (saveData.character) {
+                            this.data.character = { ...this.data.character, ...saveData.character };
+                        }
+                        if (saveData.settings) {
+                            this.data.settings = { ...this.data.settings, ...saveData.settings };
+                        }
+                        
+                        console.log('Character data loaded from localStorage');
+                        return true;
+                    }
+                } catch (error) {
+                    console.error('Failed to load from localStorage:', error);
+                }
+                return false;
+            },
+
+            clearLocalStorage() {
+                try {
+                    localStorage.removeItem('dnd-character-dashboard');
+                    this.showNotification('Data Cleared', 'All saved data has been removed.', 'var(--warning)');
+                } catch (error) {
+                    console.error('Failed to clear localStorage:', error);
+                }
+            },
+
+            exportToFile(format = 'json') {
+                const char = this.data.character;
+                const timestamp = new Date().toISOString().split('T')[0];
+                
+                if (format === 'json') {
+                    const jsonData = {
+                        character: this.data.character,
+                        settings: this.data.settings,
+                        exportDate: new Date().toISOString(),
+                        version: '1.0'
+                    };
+                    
+                    const blob = new Blob([JSON.stringify(jsonData, null, 2)], {
+                        type: 'application/json'
+                    });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `${char.name.replace(/\s+/g, '_')}_${timestamp}.json`;
+                    link.click();
+                    URL.revokeObjectURL(url);
+                } else {
+                    // Text format (existing functionality)
+                    this.exportData();
+                }
+            },
+
+            importFromFile() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            try {
+                                const importData = JSON.parse(e.target.result);
+                                
+                                if (importData.character) {
+                                    if (confirm('This will replace your current character. Continue?')) {
+                                        this.data.character = importData.character;
+                                        if (importData.settings) {
+                                            this.data.settings = importData.settings;
+                                        }
+                                        this.updateDisplay();
+                                        this.saveToLocalStorage();
+                                        this.showNotification('Import Success', 'Character data imported successfully!', 'var(--success)');
+                                    }
+                                } else {
+                                    alert('Invalid character file format.');
+                                }
+                            } catch (error) {
+                                console.error('Import error:', error);
+                                alert('Failed to import character file.');
+                            }
+                        };
+                        reader.readAsText(file);
+                    }
+                };
+                input.click();
+            },
+
+            // Auto-save functionality
+            autoSave() {
+                if (this.data.settings.autoSave) {
+                    this.saveToLocalStorage();
+                }
+            },
             openSettings() {
                 const modal = document.getElementById('settings-modal');
                 modal.classList.add('active');
@@ -2596,6 +2726,7 @@
                 this.updateDisplay();
                 this.closeEdit();
                 this.save();
+                this.autoSave(); // Trigger auto-save after edits
             },
 
             closeEdit() {
@@ -2654,68 +2785,78 @@
             },
 
             loadTemplate() {
-                this.data.character = {
-                    name: 'Zephyr Lightbringer',
-                    class: 'Cleric',
-                    level: 1,
-                    alignment: 'Lawful Good',
-                    image: null,
-                    hp: { current: 9, max: 9, temp: 0 },
-                    ac: 15,
-                    speed: 30,
-                    abilities: {
-                        str: 13, dex: 12, con: 15,
-                        int: 10, wis: 16, cha: 14
-                    },
-                    hitDice: {
-                        current: 1,
-                        max: 1,
-                        type: 'd8'
-                    },
-                    deathSaves: {
-                        successes: 0,
-                        failures: 0
-                    },
-                    inspiration: false,
-                    concentration: {
-                        active: false,
-                        spell: '',
-                        dc: 10
-                    },
-                    conditions: [],
-                    notes: {
-                        session: '',
-                        character: 'A devout cleric seeking to spread light and healing.',
-                        plot: ''
-                    },
-                    skills: {
-                        insight: true,
-                        perception: true
-                    },
-                    saves: {
-                        wis: true,
-                        cha: true
-                    },
-                    spells: {
-                        ability: 'wis',
-                        slots: { 1: 2, 2: 0, 3: 0 },
-                        known: ['Cure Wounds', 'Guiding Bolt', 'Sacred Flame']
-                    },
-                    equipment: [
-                        { name: 'Mace', quantity: 1, weight: '4 lb', notes: '1d6 bludgeoning' },
-                        { name: 'Scale Mail', quantity: 1, weight: '45 lb', notes: 'AC 14 + Dex mod (max 2)' },
-                        { name: 'Shield', quantity: 1, weight: '6 lb', notes: '+2 AC' }
-                    ],
-                    currency: { cp: 0, sp: 0, gp: 25, pp: 0 }
-                };
-                this.updateDisplay();
+                if (confirm('This will replace your current character with a template. Continue?')) {
+                    this.data.character = {
+                        name: 'Zephyr Lightbringer',
+                        class: 'Cleric',
+                        level: 1,
+                        alignment: 'Lawful Good',
+                        image: null,
+                        hp: { current: 9, max: 9, temp: 0 },
+                        ac: 15,
+                        speed: 30,
+                        abilities: {
+                            str: 13, dex: 12, con: 15,
+                            int: 10, wis: 16, cha: 14
+                        },
+                        hitDice: {
+                            current: 1,
+                            max: 1,
+                            type: 'd8'
+                        },
+                        deathSaves: {
+                            successes: 0,
+                            failures: 0
+                        },
+                        inspiration: false,
+                        concentration: {
+                            active: false,
+                            spell: '',
+                            dc: 10
+                        },
+                        conditions: [],
+                        notes: {
+                            session: '',
+                            character: 'A devout cleric seeking to spread light and healing.',
+                            plot: ''
+                        },
+                        skills: {
+                            insight: true,
+                            perception: true
+                        },
+                        saves: {
+                            wis: true,
+                            cha: true
+                        },
+                        spells: {
+                            ability: 'wis',
+                            slots: { 1: 2, 2: 0, 3: 0 },
+                            known: ['Cure Wounds', 'Guiding Bolt', 'Sacred Flame']
+                        },
+                        equipment: [
+                            { name: 'Mace', quantity: 1, weight: '4 lb', notes: '1d6 bludgeoning' },
+                            { name: 'Scale Mail', quantity: 1, weight: '45 lb', notes: 'AC 14 + Dex mod (max 2)' },
+                            { name: 'Shield', quantity: 1, weight: '6 lb', notes: '+2 AC' }
+                        ],
+                        currency: { cp: 0, sp: 0, gp: 25, pp: 0 }
+                    };
+                    this.updateDisplay();
+                    this.autoSave();
+                }
             },
 
             save() {
+                const saved = this.saveToLocalStorage();
                 const saveBtn = document.querySelector('.quick-actions .btn');
                 const originalText = saveBtn.textContent;
-                saveBtn.textContent = '✓ Saved';
-                saveBtn.style.background = 'var(--success)';
+                
+                if (saved) {
+                    saveBtn.textContent = '✓ Saved';
+                    saveBtn.style.background = 'var(--success)';
+                } else {
+                    saveBtn.textContent = '⚠ Save Failed';
+                    saveBtn.style.background = 'var(--danger)';
+                }
                 
                 setTimeout(() => {
                     saveBtn.textContent = originalText;
@@ -2912,6 +3053,7 @@
             init() {
                 this.rollHistory = [];
                 
+                // Initialize default settings
                 if (!this.data.settings) {
                     this.data.settings = {
                         fontSize: 'normal',
@@ -2929,6 +3071,20 @@
                         exportFormat: 'text'
                     };
                 }
+                
+                // Try to load saved data
+                const loaded = this.loadFromLocalStorage();
+                if (loaded) {
+                    this.showNotification('Data Loaded', 'Your saved character has been loaded.', 'var(--success)');
+                }
+                
+                // Apply loaded settings
+                this.updateFontSize(this.data.settings.fontSize);
+                this.toggleHighContrast(this.data.settings.highContrast);
+                this.toggleReducedMotion(this.data.settings.reducedMotion);
+                this.toggleMobileFriendly(this.data.settings.mobileFriendly);
+                this.toggleKeyboardNav(this.data.settings.keyboardNav);
+                this.toggleAutoRoll(this.data.settings.autoRoll);
                 
                 this.updateDisplay();
                 this.updateCharacterImage();
@@ -2959,6 +3115,13 @@
                         this.closeEdit();
                         this.closeSettings();
                         document.getElementById('dice-log-panel').classList.remove('active');
+                    }
+                });
+                
+                // Auto-save on page unload
+                window.addEventListener('beforeunload', () => {
+                    if (this.data.settings.autoSave) {
+                        this.saveToLocalStorage();
                     }
                 });
             }
