@@ -123,14 +123,20 @@
             font-family: var(--fantasy-font);
             font-size: 2.2rem;
             font-weight: 600;
-            color: var(--accent-color);
-            margin: 0 0 8px 0;
+            color: var(--accent-color) !important;
+            margin: 0 0 8px 0 !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
         
         .character-subtitle {
             font-size: 1.1rem;
             opacity: 0.8;
-            margin: 0;
+            margin: 0 !important;
+            display: block !important;
+            visibility: visible !important;
+            color: var(--text-color) !important;
         }
         
         .quick-actions {
@@ -442,6 +448,27 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+        
+        /* Force settings modal to break out of any container */
+        #settings-modal {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            background: rgba(0,0,0,0.8) !important;
+            transform: none !important;
+            margin: 0 !important;
+            padding: 20px !important;
+            box-sizing: border-box !important;
+        }
+        
+        #settings-modal.active {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
         }
         
         .edit-panel {
@@ -890,6 +917,156 @@
             min-height: 200px;
             resize: vertical;
         }
+
+        /* Settings Modal Styles */
+        .settings-content {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .settings-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .settings-section:last-child {
+            border-bottom: none;
+        }
+
+        .settings-section h3 {
+            font-family: var(--fantasy-font);
+            color: var(--accent-color);
+            margin: 0 0 15px 0;
+            font-size: 1.1rem;
+        }
+
+        .setting-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .setting-toggle input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .setting-toggle label {
+            margin: 0;
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        /* Accessibility Classes */
+        body.high-contrast {
+            --primary-bg: #000000;
+            --secondary-bg: #000000;
+            --glass-bg: #000000;
+            --text-color: #ffffff;
+            --border-color: #ffffff;
+            --accent-color: #ffff00;
+        }
+
+        body.reduced-motion * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+            transition-delay: 0ms !important;
+        }
+
+        /* Font Size Classes */
+        body.small-font {
+            font-size: 14px;
+        }
+
+        body.small-font .character-name {
+            font-size: 1.8rem;
+        }
+
+        body.small-font .vital-value {
+            font-size: 1.4rem;
+        }
+
+        body.small-font .card-title {
+            font-size: 1rem;
+        }
+
+        body.large-font {
+            font-size: 18px;
+        }
+
+        body.large-font .character-name {
+            font-size: 2.6rem;
+        }
+
+        body.large-font .vital-value {
+            font-size: 2.2rem;
+        }
+
+        body.large-font .card-title {
+            font-size: 1.4rem;
+        }
+
+        body.large-font .btn {
+            font-size: 16px;
+            padding: 12px 20px;
+        }
+
+        body.extra-large-font {
+            font-size: 20px;
+        }
+
+        body.extra-large-font .character-name {
+            font-size: 3rem;
+        }
+
+        body.extra-large-font .vital-value {
+            font-size: 2.6rem;
+        }
+
+        body.extra-large-font .card-title {
+            font-size: 1.6rem;
+        }
+
+        body.extra-large-font .btn {
+            font-size: 18px;
+            padding: 14px 22px;
+        }
+
+        body.extra-large-font .mini-btn {
+            font-size: 12px;
+            padding: 6px 10px;
+        }
+
+        body.mobile-friendly .dashboard-card {
+            padding: 25px;
+        }
+
+        body.mobile-friendly .btn,
+        body.mobile-friendly .mini-btn {
+            padding: 12px 20px;
+            font-size: 16px;
+            min-height: 44px;
+        }
+
+        body.mobile-friendly .save-dot,
+        body.mobile-friendly .inspiration-dot {
+            width: 30px;
+            height: 30px;
+        }
+
+        body.enhanced-keyboard .dashboard-card:focus,
+        body.enhanced-keyboard .btn:focus,
+        body.enhanced-keyboard .save-dot:focus {
+            outline: 3px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+
+        .click-feedback {
+            transform: scale(0.95);
+            transition: transform 0.1s ease;
+        }
     </style>
 </head>
 <body>
@@ -908,6 +1085,7 @@
                 </div>
                 <div class="quick-actions">
                     <button class="btn secondary" onclick="Dashboard.toggleTheme()">🌙 Dark Mode</button>
+                    <button class="btn secondary" onclick="Dashboard.openSettings()">⚙️ Settings</button>
                     <button class="btn secondary" onclick="Dashboard.loadTemplate()">📋 Templates</button>
                     <button class="btn" onclick="Dashboard.save()">💾 Save</button>
                     <button class="btn secondary" onclick="Dashboard.exportData()">📤 Export</button>
@@ -1148,6 +1326,146 @@
         </div>
     </div>
 
+    <!-- Settings Modal -->
+    <div class="edit-mode" id="settings-modal">
+        <div class="edit-panel">
+            <div class="edit-header">
+                <h2 class="edit-title">⚙️ Accessibility Settings</h2>
+                <button class="close-btn" onclick="Dashboard.closeSettings()">×</button>
+            </div>
+            <div class="settings-content">
+                <div class="settings-section">
+                    <h3>🎨 Visual Settings</h3>
+                    <div class="form-group">
+                        <label for="font-size-setting">Font Size</label>
+                        <select id="font-size-setting" onchange="Dashboard.updateFontSize(this.value)">
+                            <option value="small">Small (14px)</option>
+                            <option value="normal" selected>Normal (16px)</option>
+                            <option value="large">Large (18px)</option>
+                            <option value="extra-large">Extra Large (20px)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contrast-setting">High Contrast Mode</label>
+                        <div class="setting-toggle">
+                            <input type="checkbox" id="contrast-setting" onchange="Dashboard.toggleHighContrast(this.checked)">
+                            <label for="contrast-setting">Enable high contrast colors</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reduced-motion-setting">Reduce Motion</label>
+                        <div class="setting-toggle">
+                            <input type="checkbox" id="reduced-motion-setting" onchange="Dashboard.toggleReducedMotion(this.checked)">
+                            <label for="reduced-motion-setting">Disable animations and transitions</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>🎲 Dice Settings</h3>
+                    <div class="form-group">
+                        <label for="dice-sound-setting">Dice Roll Sounds</label>
+                        <div class="setting-toggle">
+                            <input type="checkbox" id="dice-sound-setting" checked onchange="Dashboard.toggleDiceSounds(this.checked)">
+                            <label for="dice-sound-setting">Play sound effects for dice rolls</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="auto-roll-setting">Auto-roll on Hover</label>
+                        <div class="setting-toggle">
+                            <input type="checkbox" id="auto-roll-setting" onchange="Dashboard.toggleAutoRoll(this.checked)">
+                            <label for="auto-roll-setting">Show dice buttons on hover (disable for touch devices)</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="roll-confirmation-setting">Roll Confirmation</label>
+                        <div class="setting-toggle">
+                            <input type="checkbox" id="roll-confirmation-setting" onchange="Dashboard.toggleRollConfirmation(this.checked)">
+                            <label for="roll-confirmation-setting">Confirm before rolling dice</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>🖱️ Interaction Settings</h3>
+                    <div class="form-group">
+                        <label for="click-feedback-setting">Click Feedback</label>
+                        <div class="setting-toggle">
+                            <input type="checkbox" id="click-feedback-setting" checked onchange="Dashboard.toggleClickFeedback(this.checked)">
+                            <label for="click-feedback-setting">Visual feedback for button clicks</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="keyboard-nav-setting">Enhanced Keyboard Navigation</label>
+                        <div class="setting-toggle">
+                            <input type="checkbox" id="keyboard-nav-setting" onchange="Dashboard.toggleKeyboardNav(this.checked)">
+                            <label for="keyboard-nav-setting">Enable tab navigation for all interactive elements</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tooltip-delay-setting">Tooltip Delay</label>
+                        <select id="tooltip-delay-setting" onchange="Dashboard.updateTooltipDelay(this.value)">
+                            <option value="0">Instant</option>
+                            <option value="500" selected>Short (0.5s)</option>
+                            <option value="1000">Medium (1s)</option>
+                            <option value="2000">Long (2s)</option>
+                            <option value="disabled">Disabled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>📱 Mobile Settings</h3>
+                    <div class="form-group">
+                        <label for="mobile-friendly-setting">Mobile-Friendly Mode</label>
+                        <div class="setting-toggle">
+                            <input type="checkbox" id="mobile-friendly-setting" onchange="Dashboard.toggleMobileFriendly(this.checked)">
+                            <label for="mobile-friendly-setting">Larger touch targets and simplified interface</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="swipe-navigation-setting">Swipe Navigation</label>
+                        <div class="setting-toggle">
+                            <input type="checkbox" id="swipe-navigation-setting" onchange="Dashboard.toggleSwipeNav(this.checked)">
+                            <label for="swipe-navigation-setting">Enable swipe gestures for navigation</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>💾 Data Settings</h3>
+                    <div class="form-group">
+                        <label for="auto-save-setting">Auto-Save</label>
+                        <div class="setting-toggle">
+                            <input type="checkbox" id="auto-save-setting" checked onchange="Dashboard.toggleAutoSave(this.checked)">
+                            <label for="auto-save-setting">Automatically save changes</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="export-format-setting">Default Export Format</label>
+                        <select id="export-format-setting" onchange="Dashboard.updateExportFormat(this.value)">
+                            <option value="text" selected>Text (.txt)</option>
+                            <option value="json">JSON (.json)</option>
+                            <option value="both">Both formats</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 25px;">
+                <button class="btn secondary" onclick="Dashboard.resetSettings()">Reset to Defaults</button>
+                <button class="btn" onclick="Dashboard.closeSettings()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Dice Log Widget -->
     <div class="dice-log-widget" onclick="Dashboard.toggleDiceLog()" title="Dice Roll History">
         🎲
@@ -1216,18 +1534,6 @@
                     notes: {
                         session: '',
                         character: 'A devout cleric seeking to spread light and healing.',
-                        plot: ''
-                    },
-                    inspiration: false,
-                    concentration: {
-                        active: false,
-                        spell: '',
-                        dc: 10
-                    },
-                    conditions: [],
-                    notes: {
-                        session: '',
-                        character: '',
                         plot: ''
                     },
                     skills: {
@@ -1543,6 +1849,152 @@
                 }, 2000);
             },
 
+            // Settings functionality
+            openSettings() {
+                const modal = document.getElementById('settings-modal');
+                modal.classList.add('active');
+                this.loadSettingsValues();
+            },
+
+            closeSettings() {
+                document.getElementById('settings-modal').classList.remove('active');
+            },
+
+            loadSettingsValues() {
+                const settings = this.data.settings;
+                
+                const setIfExists = (id, value) => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        if (element.type === 'checkbox') {
+                            element.checked = value;
+                        } else {
+                            element.value = value;
+                        }
+                    }
+                };
+                
+                setIfExists('font-size-setting', settings.fontSize);
+                setIfExists('contrast-setting', settings.highContrast);
+                setIfExists('reduced-motion-setting', settings.reducedMotion);
+                setIfExists('dice-sound-setting', settings.diceSounds);
+                setIfExists('auto-roll-setting', settings.autoRoll);
+                setIfExists('roll-confirmation-setting', settings.rollConfirmation);
+                setIfExists('click-feedback-setting', settings.clickFeedback);
+                setIfExists('keyboard-nav-setting', settings.keyboardNav);
+                setIfExists('tooltip-delay-setting', settings.tooltipDelay);
+                setIfExists('mobile-friendly-setting', settings.mobileFriendly);
+                setIfExists('swipe-navigation-setting', settings.swipeNav);
+                setIfExists('auto-save-setting', settings.autoSave);
+                setIfExists('export-format-setting', settings.exportFormat);
+            },
+
+            updateFontSize(size) {
+                this.data.settings.fontSize = size;
+                document.body.classList.remove('small-font', 'large-font', 'extra-large-font');
+                
+                if (size === 'small') {
+                    document.body.classList.add('small-font');
+                } else if (size === 'large') {
+                    document.body.classList.add('large-font');
+                } else if (size === 'extra-large') {
+                    document.body.classList.add('extra-large-font');
+                }
+            },
+
+            toggleHighContrast(enabled) {
+                this.data.settings.highContrast = enabled;
+                document.body.classList.toggle('high-contrast', enabled);
+            },
+
+            toggleReducedMotion(enabled) {
+                this.data.settings.reducedMotion = enabled;
+                document.body.classList.toggle('reduced-motion', enabled);
+            },
+
+            toggleDiceSounds(enabled) {
+                this.data.settings.diceSounds = enabled;
+            },
+
+            toggleAutoRoll(enabled) {
+                this.data.settings.autoRoll = enabled;
+                const style = document.createElement('style');
+                style.textContent = enabled ? '' : `
+                    .dice-btn { opacity: 1 !important; transform: scale(1) !important; }
+                `;
+                style.id = 'auto-roll-style';
+                
+                const existing = document.getElementById('auto-roll-style');
+                if (existing) existing.remove();
+                if (!enabled) document.head.appendChild(style);
+            },
+
+            toggleRollConfirmation(enabled) {
+                this.data.settings.rollConfirmation = enabled;
+            },
+
+            toggleClickFeedback(enabled) {
+                this.data.settings.clickFeedback = enabled;
+            },
+
+            toggleKeyboardNav(enabled) {
+                this.data.settings.keyboardNav = enabled;
+                document.body.classList.toggle('enhanced-keyboard', enabled);
+                
+                const interactiveElements = document.querySelectorAll('.dashboard-card, .btn, .save-dot, .inspiration-dot');
+                interactiveElements.forEach(el => {
+                    el.tabIndex = enabled ? 0 : -1;
+                });
+            },
+
+            updateTooltipDelay(delay) {
+                this.data.settings.tooltipDelay = delay;
+            },
+
+            toggleMobileFriendly(enabled) {
+                this.data.settings.mobileFriendly = enabled;
+                document.body.classList.toggle('mobile-friendly', enabled);
+            },
+
+            toggleSwipeNav(enabled) {
+                this.data.settings.swipeNav = enabled;
+            },
+
+            toggleAutoSave(enabled) {
+                this.data.settings.autoSave = enabled;
+            },
+
+            updateExportFormat(format) {
+                this.data.settings.exportFormat = format;
+            },
+
+            resetSettings() {
+                this.data.settings = {
+                    fontSize: 'normal',
+                    highContrast: false,
+                    reducedMotion: false,
+                    diceSounds: true,
+                    autoRoll: true,
+                    rollConfirmation: false,
+                    clickFeedback: true,
+                    keyboardNav: false,
+                    tooltipDelay: 500,
+                    mobileFriendly: false,
+                    swipeNav: false,
+                    autoSave: true,
+                    exportFormat: 'text'
+                };
+                
+                document.body.classList.remove(
+                    'high-contrast', 'reduced-motion', 'small-font', 
+                    'large-font', 'extra-large-font', 'mobile-friendly', 
+                    'enhanced-keyboard'
+                );
+                
+                this.loadSettingsValues();
+                this.showNotification('Settings Reset', 'All settings have been reset to defaults.', 'var(--success)');
+            },
+
             showRollResult(rollType, d20Roll, modifier, total, extraText = '', extraClass = '') {
                 const resultDiv = document.createElement('div');
                 resultDiv.className = 'roll-result';
@@ -1568,7 +2020,6 @@
                 
                 document.body.appendChild(resultDiv);
                 
-                // Remove after animation
                 setTimeout(() => {
                     if (document.body.contains(resultDiv)) {
                         document.body.removeChild(resultDiv);
@@ -1625,9 +2076,16 @@
                 const char = this.data.character;
                 
                 // Header
-                document.getElementById('character-name').textContent = char.name;
-                document.getElementById('character-subtitle').textContent = 
-                    `Level ${char.level} ${char.class} • ${char.alignment}`;
+                const nameElement = document.getElementById('character-name');
+                const subtitleElement = document.getElementById('character-subtitle');
+                
+                if (nameElement) {
+                    nameElement.textContent = char.name;
+                }
+                
+                if (subtitleElement) {
+                    subtitleElement.textContent = `Level ${char.level} ${char.class} • ${char.alignment}`;
+                }
                 
                 // Vital stats
                 document.getElementById('hp-display').textContent = 
@@ -1665,7 +2123,7 @@
                 document.getElementById('hd-display').textContent = 
                     `${char.hitDice.current}/${char.hitDice.max} ${char.hitDice.type}`;
                 
-                // Death Saves - use setTimeout to ensure DOM elements exist
+                // Update other displays
                 setTimeout(() => {
                     this.updateDeathSaves();
                     this.updateConditionsDisplay();
@@ -1741,8 +2199,6 @@
             },
 
             editSection(section) {
-                console.log('Opening edit for:', section);
-                
                 const modal = document.getElementById('edit-modal');
                 const title = document.getElementById('edit-title');
                 const content = document.getElementById('edit-content');
@@ -2220,6 +2676,18 @@
                         successes: 0,
                         failures: 0
                     },
+                    inspiration: false,
+                    concentration: {
+                        active: false,
+                        spell: '',
+                        dc: 10
+                    },
+                    conditions: [],
+                    notes: {
+                        session: '',
+                        character: 'A devout cleric seeking to spread light and healing.',
+                        plot: ''
+                    },
                     skills: {
                         insight: true,
                         perception: true
@@ -2244,7 +2712,6 @@
             },
 
             save() {
-                console.log('Character saved:', this.data.character);
                 const saveBtn = document.querySelector('.quick-actions .btn');
                 const originalText = saveBtn.textContent;
                 saveBtn.textContent = '✓ Saved';
@@ -2259,28 +2726,24 @@
             exportData() {
                 const char = this.data.character;
                 
-                // Helper function to center text
                 const centerText = (text, width = 60) => {
                     const padding = Math.max(0, Math.floor((width - text.length) / 2));
                     return ' '.repeat(padding) + text;
                 };
                 
-                // Helper function to center a line with borders
                 const centerLine = (text, width = 60) => {
-                    const contentWidth = width - 4; // Account for border spaces
+                    const contentWidth = width - 4;
                     const padding = Math.max(0, Math.floor((contentWidth - text.length) / 2));
                     const leftPad = ' '.repeat(padding);
                     const rightPad = ' '.repeat(contentWidth - text.length - padding);
                     return `  ${leftPad}${text}${rightPad}  `;
                 };
                 
-                // Create a human-readable character sheet
                 let output = '═'.repeat(60) + '\n';
                 output += centerLine(char.name.toUpperCase()) + '\n';
                 output += centerLine(`Level ${char.level} ${char.class} • ${char.alignment}`) + '\n';
                 output += '═'.repeat(60) + '\n\n';
 
-                // Vital Stats
                 output += centerText('VITAL STATISTICS') + '\n';
                 output += centerText('─'.repeat(16)) + '\n';
                 output += centerText(`Hit Points: ${char.hp.current}/${char.hp.max}`) + '\n';
@@ -2288,7 +2751,6 @@
                 output += centerText(`Speed: ${char.speed} ft`) + '\n';
                 output += centerText(`Hit Dice: ${char.hitDice.current}/${char.hitDice.max} ${char.hitDice.type}`) + '\n\n';
 
-                // Ability Scores
                 output += centerText('ABILITY SCORES') + '\n';
                 output += centerText('─'.repeat(14)) + '\n';
                 Object.entries(char.abilities).forEach(([ability, score]) => {
@@ -2298,7 +2760,6 @@
                 });
                 output += '\n';
 
-                // Combat Stats
                 const dexMod = this.calculateModifier(char.abilities.dex);
                 const profBonus = Math.ceil(char.level / 4) + 1;
                 output += centerText('COMBAT') + '\n';
@@ -2306,7 +2767,6 @@
                 output += centerText(`Initiative: ${this.formatModifier(dexMod)}`) + '\n';
                 output += centerText(`Proficiency Bonus: ${this.formatModifier(profBonus)}`) + '\n';
                 
-                // Saving Throws
                 if (char.saves && Object.keys(char.saves).length > 0) {
                     output += '\n' + centerText('Saving Throws (Proficient):') + '\n';
                     Object.entries(char.saves).forEach(([save, proficient]) => {
@@ -2319,13 +2779,11 @@
                 }
                 output += '\n';
 
-                // Skills
                 if (char.skills && Object.keys(char.skills).length > 0) {
                     output += centerText('SKILLS (PROFICIENT)') + '\n';
                     output += centerText('─'.repeat(19)) + '\n';
                     Object.entries(char.skills).forEach(([skill, proficient]) => {
                         if (proficient) {
-                            // Calculate skill modifier based on ability
                             let abilityMod = 0;
                             switch(skill) {
                                 case 'athletics': abilityMod = this.calculateModifier(char.abilities.str); break;
@@ -2342,7 +2800,6 @@
                     output += '\n';
                 }
 
-                // Status & Conditions
                 output += centerText('STATUS') + '\n';
                 output += centerText('─'.repeat(6)) + '\n';
                 output += centerText(`Inspiration: ${char.inspiration ? 'YES' : 'No'}`) + '\n';
@@ -2364,13 +2821,11 @@
                 }
                 output += '\n';
 
-                // Spells (if any)
                 if (char.spells && char.spells.ability && char.spells.ability !== 'none') {
                     output += centerText('SPELLCASTING') + '\n';
                     output += centerText('─'.repeat(12)) + '\n';
                     output += centerText(`Spellcasting Ability: ${char.spells.ability.toUpperCase()}`) + '\n';
                     
-                    // Spell slots
                     const activeSlots = Object.entries(char.spells.slots || {}).filter(([level, slots]) => slots > 0);
                     if (activeSlots.length > 0) {
                         output += '\n' + centerText('Spell Slots:') + '\n';
@@ -2380,7 +2835,6 @@
                         });
                     }
                     
-                    // Known spells
                     if (char.spells.known && char.spells.known.length > 0) {
                         output += '\n' + centerText('Known Spells:') + '\n';
                         char.spells.known.forEach(spell => {
@@ -2390,7 +2844,6 @@
                     output += '\n';
                 }
 
-                // Equipment
                 if (char.equipment && char.equipment.length > 0) {
                     output += centerText('EQUIPMENT') + '\n';
                     output += centerText('─'.repeat(9)) + '\n';
@@ -2407,7 +2860,6 @@
                     output += '\n';
                 }
 
-                // Currency
                 const activeCurrency = Object.entries(char.currency || {}).filter(([type, amount]) => amount > 0);
                 if (activeCurrency.length > 0) {
                     output += centerText('CURRENCY') + '\n';
@@ -2420,7 +2872,6 @@
                     output += '\n';
                 }
 
-                // Notes
                 const allNotes = [
                     { title: 'Character Notes', content: char.notes?.character },
                     { title: 'Session Notes', content: char.notes?.session },
@@ -2432,7 +2883,6 @@
                     output += centerText('─'.repeat(5)) + '\n';
                     allNotes.forEach(note => {
                         output += centerText(`${note.title}:`) + '\n';
-                        // For notes, we'll center each line individually
                         const lines = note.content.trim().split('\n');
                         lines.forEach(line => {
                             if (line.trim()) {
@@ -2448,7 +2898,6 @@
                 output += centerText(new Date().toLocaleDateString()) + '\n';
                 output += '═'.repeat(60);
 
-                // Export as text file
                 const blob = new Blob([output], {
                     type: 'text/plain'
                 });
@@ -2461,18 +2910,41 @@
             },
 
             init() {
-                this.updateDisplay();
-                this.updateCharacterImage();
                 this.rollHistory = [];
                 
-                // Modal close on outside click
+                if (!this.data.settings) {
+                    this.data.settings = {
+                        fontSize: 'normal',
+                        highContrast: false,
+                        reducedMotion: false,
+                        diceSounds: true,
+                        autoRoll: true,
+                        rollConfirmation: false,
+                        clickFeedback: true,
+                        keyboardNav: false,
+                        tooltipDelay: 500,
+                        mobileFriendly: false,
+                        swipeNav: false,
+                        autoSave: true,
+                        exportFormat: 'text'
+                    };
+                }
+                
+                this.updateDisplay();
+                this.updateCharacterImage();
+                
                 document.getElementById('edit-modal').addEventListener('click', (e) => {
                     if (e.target.id === 'edit-modal') {
                         this.closeEdit();
                     }
                 });
                 
-                // Close dice log when clicking outside
+                document.getElementById('settings-modal').addEventListener('click', (e) => {
+                    if (e.target.id === 'settings-modal') {
+                        this.closeSettings();
+                    }
+                });
+                
                 document.addEventListener('click', (e) => {
                     const diceWidget = document.querySelector('.dice-log-widget');
                     const dicePanel = document.getElementById('dice-log-panel');
@@ -2482,21 +2954,20 @@
                     }
                 });
                 
-                // Keyboard shortcuts
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') {
                         this.closeEdit();
+                        this.closeSettings();
                         document.getElementById('dice-log-panel').classList.remove('active');
                     }
                 });
             }
         };
 
-        // Initialize when page loads
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('Dashboard loading...');
-            Dashboard.init();
-            console.log('Dashboard ready!');
+            if (typeof Dashboard === 'object' && Dashboard.init) {
+                Dashboard.init();
+            }
         });
     </script>
 </body>
